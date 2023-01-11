@@ -12,8 +12,6 @@ class Chessboard {
     }
 
     void render(sfRenderWindow* renderWindow) {
-        assert(renderWindow.sfRenderWindow_getSize() == _windowSize, "renderWindow size must be equal to the windowSize set in the constructor");
-
         foreach (sfRectangleShape* rect; _chessboardRectangles) {
             assert(rect !is null, "rect cannot be null");
 
