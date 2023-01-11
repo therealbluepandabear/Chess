@@ -38,6 +38,10 @@ class Window {
     }
 
     @property {
+        sfVector2u windowSize() {
+            return _windowSize;
+        }
+
         bool isDone() {
             return _isDone;
         }

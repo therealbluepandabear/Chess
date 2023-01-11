@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="bindbc-sfml-1.0.2" type="DLangLib">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.dub/packages/bindbc-sfml-1.0.2/bindbc-sfml/source" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
