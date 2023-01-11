@@ -28,15 +28,15 @@ class Chessboard {
                 for (float y = 0; y < 8; ++y) {
                     if (x % 2 == 0) {
                         if (y % 2 == 0) {
-                            fillColor = sfBlack;
-                        } else {
                             fillColor = sfWhite;
+                        } else {
+                            fillColor = sfBlack;
                         }
                     } else {
                         if (y % 2 != 0) {
-                            fillColor = sfBlack;
-                        } else {
                             fillColor = sfWhite;
+                        } else {
+                            fillColor = sfBlack;
                         }
                     }
 
