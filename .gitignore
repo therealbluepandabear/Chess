@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/chess
+chess.so
+chess.dylib
+chess.dll
+chess.a
+chess.lib
+chess-test-*
+*.exe
+*.o
+*.obj
+*.lst
