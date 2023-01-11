@@ -5,12 +5,11 @@ import std.stdio;
 import std.string;
 
 class Window {
-    this() {
-        setup("Chess", sfVector2u(500, 500));
-    }
-
     this(string title, sfVector2u size) {
-        setup(title, size);
+        _windowTitle = title;
+        _windowSize = size;
+        _isDone = false;
+        create();
     }
 
     ~this() {
@@ -53,13 +52,6 @@ class Window {
     }
 
     private {
-        void setup(string title, sfVector2u size) {
-            _windowTitle = title;
-            _windowSize = size;
-            _isDone = false;
-            create();
-        }
-
         void destroy() {
             _renderWindow.sfRenderWindow_close();
         }

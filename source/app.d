@@ -1,5 +1,14 @@
 import std.stdio;
+import bindbc.sfml;
+import game;
 
 void main() {
-	writeln("Edit source/app.d to start your project.");
+	loadSFML();
+
+	Game game = new Game();
+
+	while (!game.window.isDone()) {
+		game.update();
+		game.render();
+	}
 }
