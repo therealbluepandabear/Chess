@@ -8,7 +8,7 @@ class Chessboard {
         _windowSize = windowSize;
         initChessboardRectangles();
 
-        assert(_chessboardRectangles.length == 64, "Invalid length");
+        assert(_chessboardRectangles.length == 64, "_chessboardRectangles has invalid length");
     }
 
     void render(sfRenderWindow* renderWindow) {
@@ -39,6 +39,7 @@ class Chessboard {
                             fillColor = sfWhite;
                         }
                     }
+
                     sfRectangleShape* shape = sfRectangleShape_create();
                     shape.sfRectangleShape_setSize(sfVector2f(blockSize, blockSize));
                     shape.sfRectangleShape_setFillColor(fillColor);
