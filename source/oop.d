@@ -262,7 +262,7 @@ abstract class ChessPiece {
 class Pawn : ChessPiece {
     override {
         sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
-            return [];
+            return [sfVector2i(_boardPosition.x, _boardPosition.y + 1)];
         }
     }
 }

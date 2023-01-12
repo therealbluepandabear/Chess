@@ -37,10 +37,6 @@ class GUIChessboard {
         }
     }
 
-    void addChessPiece(ChessPiece chessPiece) {
-        _guiChessPieces ~= new GUIChessPiece(chessPiece, _squareSize);
-    }
-
     @property {
         float squareSize() {
             return _squareSize;
