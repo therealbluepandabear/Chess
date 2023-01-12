@@ -29,8 +29,7 @@ final class ChessSpriteLoader {
             sfSprite* pawnSprite = sfSprite_create();
 
             import sfmlextensions;
-            sfVector2f bounds = sfVector2fExt_splat(size);
-            pawnSprite.sfSprite_setScale(sfVector2f(bounds.x / pawnTexture.sfTexture_getSize().x, bounds.y / pawnTexture.sfTexture_getSize().y));
+            pawnSprite.sfSprite_setScale(sfVector2f(size / pawnTexture.sfTexture_getSize().x, size / pawnTexture.sfTexture_getSize().y));
             pawnSprite.sfSprite_setTexture(pawnTexture, 0);
             pawnSprite.sfSprite_setPosition(sfVector2f(chessPiece.boardPosition.x * size, chessPiece.boardPosition.y * size));
 

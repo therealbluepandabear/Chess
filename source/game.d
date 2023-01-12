@@ -5,6 +5,7 @@ import bindbc.sfml;
 import chessboard;
 import chesspiece;
 import sfmlextensions;
+import guichesspiece;
 
 class Game {
     this() {
@@ -20,10 +21,12 @@ class Game {
 
     void render() {
         _window.beginDraw();
+
         _chessboard.render(_window.renderWindow);
-        foreach (sfSprite* pieceSprite; _pieces) {
-            _window.renderWindow.sfRenderWindowExt_draw(pieceSprite);
+        foreach (GUIChessPiece guiChessPiece; _pieces) {
+            guiChessPiece.render(_window.renderWindow);
         }
+
         _window.endDraw();
     }
 
@@ -38,7 +41,7 @@ class Game {
             ChessPiece pawn = new Pawn();
             for (int i = 0; i < 8; ++i) {
                 pawn.boardPosition = sfVector2i(i, 1);
-                _pieces ~= ChessSpriteLoader.load(pawn, _chessboard.squareSize);
+                _pieces ~= new GUIChessPiece(pawn, _chessboard.squareSize);
             }
 
             ChessPiece rook = new Rook();
@@ -48,16 +51,16 @@ class Game {
                 } else {
                     rook.boardPosition(sfVector2i(7, 0));
                 }
-                _pieces ~= ChessSpriteLoader.load(rook, _chessboard.squareSize);
+                _pieces ~= new GUIChessPiece(rook, _chessboard.squareSize);
             }
 
             ChessPiece king = new King();
             king.boardPosition = sfVector2i(4, 0);
-            _pieces ~= ChessSpriteLoader.load(king, _chessboard.squareSize);
+            _pieces ~= new GUIChessPiece(king, _chessboard.squareSize);
 
             ChessPiece queen = new Queen();
             queen.boardPosition = sfVector2i(3, 0);
-            _pieces ~= ChessSpriteLoader.load(queen, _chessboard.squareSize);
+            _pieces ~= new GUIChessPiece(queen, _chessboard.squareSize);
 
             ChessPiece knight = new Knight();
             for (int i = 0; i < 2; ++i) {
@@ -66,7 +69,7 @@ class Game {
                 } else {
                     knight.boardPosition = sfVector2i(6, 0);
                 }
-                _pieces ~= ChessSpriteLoader.load(knight, _chessboard.squareSize);
+                _pieces ~= new GUIChessPiece(knight, _chessboard.squareSize);
             }
 
             ChessPiece bishop = new Bishop();
@@ -76,12 +79,12 @@ class Game {
                 } else {
                     bishop.boardPosition = sfVector2i(5, 0);
                 }
-                _pieces ~= ChessSpriteLoader.load(bishop, _chessboard.squareSize);
+                _pieces ~= new GUIChessPiece(bishop, _chessboard.squareSize);
             }
         }
 
         Window _window;
         Chessboard _chessboard;
-        sfSprite*[] _pieces;
+        GUIChessPiece[] _pieces;
     }
 }
