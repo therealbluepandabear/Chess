@@ -14,17 +14,41 @@ final class ChessSpriteLoader {
         sfSprite* load(ChessPiece chessPiece, float size) {
             string path = "assets/";
             if (typeid(chessPiece) == typeid(Pawn)) {
-                path ~= "black_pawn.png";
+                if (chessPiece.color == ChessPieceColor.black) {
+                    path ~= "black_pawn.png";
+                } else {
+                    path ~= "white_pawn.png";
+                }
             } else if (typeid(chessPiece) == typeid(Rook)) {
-                path ~= "black_rook.png";
+                if (chessPiece.color == ChessPieceColor.black) {
+                    path ~= "black_rook.png";
+                } else {
+                    path ~= "white_rook.png";
+                }
             } else if (typeid(chessPiece) == typeid(King)) {
-                path ~= "black_king.png";
+                if (chessPiece.color == ChessPieceColor.black) {
+                    path ~= "black_king.png";
+                } else {
+                    path ~= "white_king.png";
+                }
             } else if (typeid(chessPiece) == typeid(Queen)) {
-                path ~= "black_queen.png";
+                if (chessPiece.color == ChessPieceColor.black) {
+                    path ~= "black_queen.png";
+                } else {
+                    path ~= "white_queen.png";
+                }
             } else if (typeid(chessPiece) == typeid(Knight)) {
-                path ~= "black_knight.png";
+                if (chessPiece.color == ChessPieceColor.black) {
+                    path ~= "black_knight.png";
+                } else {
+                    path ~= "white_knight.png";
+                }
             } else if (typeid(chessPiece) == typeid(Bishop)) {
-                path ~= "black_bishop.png";
+                if (chessPiece.color == ChessPieceColor.black) {
+                    path ~= "black_bishop.png";
+                } else {
+                    path ~= "white_bishop.png";
+                }
             }
 
             import std.string;
@@ -89,7 +113,7 @@ class ChessboardOrganizer {
                     } else {
                         knight.boardPosition = sfVector2i(6, 7);
                     }
-                    knight.color = ChessPieceColor.black;
+                    knight.color = ChessPieceColor.white;
                 }
 
                 _chessboard.addChessPiece(knight);
@@ -113,7 +137,7 @@ class ChessboardOrganizer {
                     } else {
                         bishop.boardPosition = sfVector2i(5, 7);
                     }
-                    bishop.color = ChessPieceColor.black;
+                    bishop.color = ChessPieceColor.white;
                 }
 
                 _chessboard.addChessPiece(bishop);
@@ -137,7 +161,7 @@ class ChessboardOrganizer {
                     } else {
                         rook.boardPosition = sfVector2i(7, 7);
                     }
-                    rook.color = ChessPieceColor.black;
+                    rook.color = ChessPieceColor.white;
                 }
 
                 _chessboard.addChessPiece(rook);
