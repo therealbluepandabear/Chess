@@ -12,6 +12,8 @@ final class ChessSpriteLoader {
             string path = "assets/";
             if (typeid(chessPiece) == typeid(Pawn)) {
                 path ~= "black_pawn.png";
+            } else if (typeid(chessPiece) == typeid(Rook)) {
+                path ~= "black_rook.png";
             }
 
             import std.string;
@@ -61,3 +63,6 @@ class Pawn : ChessPiece {
 
 }
 
+class Rook : ChessPiece {
+
+}

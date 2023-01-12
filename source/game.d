@@ -11,7 +11,7 @@ class Game {
         _window = new Window("Chess", sfVector2u(500, 500));
         _chessboard = new Chessboard(_window.windowSize);
 
-        initPawns();
+        initPieces();
     }
 
     void update() {
@@ -21,8 +21,8 @@ class Game {
     void render() {
         _window.beginDraw();
         _chessboard.render(_window.renderWindow);
-        foreach (sfSprite* pawnSprite; _pawns) {
-            _window.renderWindow.sfRenderWindowExt_draw(pawnSprite);
+        foreach (sfSprite* pieceSprite; _pieces) {
+            _window.renderWindow.sfRenderWindowExt_draw(pieceSprite);
         }
         _window.endDraw();
     }
@@ -34,18 +34,27 @@ class Game {
     }
 
     private {
-        void initPawns() {
+        void initPieces() {
             Pawn pawn = new Pawn();
             sfSprite* pawnSprite = ChessSpriteLoader.load(pawn, _chessboard.squareSize);
-
             for (int i = 0; i < 8; ++i) {
                 pawn.boardPosition = sfVector2i(i, 1);
-                _pawns ~= ChessSpriteLoader.load(pawn, _chessboard.squareSize);
+                _pieces ~= ChessSpriteLoader.load(pawn, _chessboard.squareSize);
+            }
+
+            Rook rook = new Rook();
+            for (int i = 0; i < 2; ++i) {
+                if (i == 0) {
+                    rook.boardPosition(sfVector2i(0, 0));
+                } else {
+                    rook.boardPosition(sfVector2i(7, 0));
+                }
+                _pieces ~= ChessSpriteLoader.load(rook, _chessboard.squareSize);
             }
         }
 
         Window _window;
         Chessboard _chessboard;
-        sfSprite*[] _pawns;
+        sfSprite*[] _pieces;
     }
 }
