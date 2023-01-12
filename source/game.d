@@ -36,7 +36,6 @@ class Game {
     private {
         void initPieces() {
             Pawn pawn = new Pawn();
-            sfSprite* pawnSprite = ChessSpriteLoader.load(pawn, _chessboard.squareSize);
             for (int i = 0; i < 8; ++i) {
                 pawn.boardPosition = sfVector2i(i, 1);
                 _pieces ~= ChessSpriteLoader.load(pawn, _chessboard.squareSize);
