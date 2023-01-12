@@ -6,6 +6,7 @@ enum ChessPieceColor {
     black, white
 }
 
+
 final class ChessSpriteLoader {
     static {
         sfSprite* load(ChessPiece chessPiece, float size) {
@@ -22,6 +23,7 @@ final class ChessSpriteLoader {
             sfVector2f bounds = sfVector2fExt_splat(size);
             pawnSprite.sfSprite_setScale(sfVector2f(bounds.x / pawnTexture.sfTexture_getSize().x, bounds.y / pawnTexture.sfTexture_getSize().y));
             pawnSprite.sfSprite_setTexture(pawnTexture, 0);
+            pawnSprite.sfSprite_setPosition(sfVector2f(chessPiece.boardPosition.x * size, chessPiece.boardPosition.y * size));
 
             return pawnSprite;
         }
@@ -34,25 +36,25 @@ abstract class ChessPiece {
             return _color;
         }
 
-        sfVector2i position() {
-            return _position;
+        sfVector2i boardPosition() {
+            return _boardPosition;
         }
 
         void color(ChessPieceColor color) {
             _color = color;
         }
 
-        void position(sfVector2i position) {
-            assert(position.x <= 7 && position.x >= 0, "Invalid x position");
-            assert(position.y <= 7 && position.y >= 0, "Invalid y position");
+        void boardPosition(sfVector2i boardPosition) {
+            assert(boardPosition.x <= 7 && boardPosition.x >= 0, "Invalid x position");
+            assert(boardPosition.y <= 7 && boardPosition.y >= 0, "Invalid y position");
 
-            _position = position;
+            _boardPosition = boardPosition;
         }
     }
 
     private {
         ChessPieceColor _color;
-        sfVector2i _position;
+        sfVector2i _boardPosition;
     }
 }
 
