@@ -1,4 +1,3 @@
-import std.stdio;
 import bindbc.sfml;
 import game;
 

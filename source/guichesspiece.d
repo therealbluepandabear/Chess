@@ -1,7 +1,7 @@
 module guichesspiece;
 
 import bindbc.sfml;
-import chesspiece;
+import oop;
 import sfmlextensions;
 
 class GUIChessPiece {
@@ -17,8 +17,7 @@ class GUIChessPiece {
             if (event.type == sfEventType.sfEvtMouseButtonPressed) {
                 _executeClick = true;
             } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeClick) {
-                import std.stdio;
-                writeln("Clicked"); stdout.flush();
+                onClick(renderWindow);
                 _executeClick = false;
             }
         }
@@ -29,6 +28,10 @@ class GUIChessPiece {
     }
 
     private {
+        void onClick(sfRenderWindow* renderWindow) {
+            // TODO
+        }
+
         bool isMousePositionInBounds(sfVector2i mousePosition) {
             return (mousePosition.x >= _chessSprite.sfSprite_getPosition().x &&
                     mousePosition.x <= _chessSprite.sfSprite_getPosition().x + _chessSprite.sfSpriteExt_getSize().x &&

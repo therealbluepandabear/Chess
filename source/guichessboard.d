@@ -1,9 +1,11 @@
-module chessboard;
+module guichessboard;
 
 import bindbc.sfml;
 import sfmlextensions;
+import oop;
+import guichesspiece;
 
-class Chessboard {
+class GUIChessboard {
     this(sfVector2u windowSize) {
         _windowSize = windowSize;
         _squareSize = (cast(float)_windowSize.x) / 8f;
@@ -13,16 +15,30 @@ class Chessboard {
     }
 
     void render(sfRenderWindow* renderWindow) {
+        assert(_guiChessPieces.length == 32, "_guiChessPieces has invalid length");
+
         foreach (sfRectangleShape* rect; _chessboardRectangles) {
             assert(rect !is null, "rect cannot be null");
 
             renderWindow.sfRenderWindowExt_draw(rect);
         }
+
+        foreach (GUIChessPiece guiChessPiece; _guiChessPieces) {
+            guiChessPiece.render(renderWindow);
+        }
+    }
+
+    void addChessPiece(ChessPiece chessPiece) {
+        _guiChessPieces ~= new GUIChessPiece(chessPiece, _squareSize);
     }
 
     @property {
         float squareSize() {
             return _squareSize;
+        }
+
+        GUIChessPiece[] guiChessPieces() {
+            return _guiChessPieces;
         }
     }
 
@@ -60,5 +76,6 @@ class Chessboard {
         sfRectangleShape*[] _chessboardRectangles;
         sfVector2u _windowSize;
         float _squareSize;
+        GUIChessPiece[] _guiChessPieces;
     }
 }
