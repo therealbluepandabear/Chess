@@ -6,7 +6,6 @@ enum ChessPieceColor {
     black, white
 }
 
-
 final class ChessSpriteLoader {
     static {
         sfSprite* load(ChessPiece chessPiece, float size) {
