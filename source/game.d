@@ -54,6 +54,10 @@ class Game {
             ChessPiece king = new King();
             king.boardPosition = sfVector2i(4, 0);
             _pieces ~= ChessSpriteLoader.load(king, _chessboard.squareSize);
+
+            ChessPiece queen = new Queen();
+            queen.boardPosition = sfVector2i(3, 0);
+            _pieces ~= ChessSpriteLoader.load(queen, _chessboard.squareSize);
         }
 
         Window _window;

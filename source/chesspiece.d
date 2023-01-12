@@ -16,6 +16,8 @@ final class ChessSpriteLoader {
                 path ~= "black_rook.png";
             } else if (typeid(chessPiece) == typeid(King)) {
                 path ~= "black_king.png";
+            } else if (typeid(chessPiece) == typeid(Queen)) {
+                path ~= "black_queen.png";
             }
 
             import std.string;
@@ -66,6 +68,10 @@ class Pawn : ChessPiece {
 }
 
 class Rook : ChessPiece {
+
+}
+
+class Queen : ChessPiece {
 
 }
 
