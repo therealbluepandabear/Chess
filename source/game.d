@@ -68,6 +68,16 @@ class Game {
                 }
                 _pieces ~= ChessSpriteLoader.load(knight, _chessboard.squareSize);
             }
+
+            ChessPiece bishop = new Bishop();
+            for (int i = 0; i < 2; ++i) {
+                if (i == 0) {
+                    bishop.boardPosition = sfVector2i(2, 0);
+                } else {
+                    bishop.boardPosition = sfVector2i(5, 0);
+                }
+                _pieces ~= ChessSpriteLoader.load(bishop, _chessboard.squareSize);
+            }
         }
 
         Window _window;
