@@ -3,6 +3,7 @@ module guichesspiece;
 import bindbc.sfml;
 import oop;
 import sfmlextensions;
+import guichessboard;
 
 class GUIChessPiece {
     this(ChessPiece chessPiece, float size) {
@@ -10,14 +11,14 @@ class GUIChessPiece {
         _chessSprite = ChessSpriteLoader.load(chessPiece, size);
     }
 
-    void update(sfRenderWindow* renderWindow, sfEvent event) {
+    void update(GUIChessboard guiChessboard, sfRenderWindow* renderWindow, sfEvent event) {
         sfVector2i mousePosition = sfMouse_getPositionRenderWindow(renderWindow);
 
         if (isMousePositionInBounds(mousePosition)) {
             if (event.type == sfEventType.sfEvtMouseButtonPressed) {
                 _executeClick = true;
             } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeClick) {
-                onClick(renderWindow);
+                onClick(guiChessboard, renderWindow);
                 _executeClick = false;
             }
         }
@@ -28,8 +29,9 @@ class GUIChessPiece {
     }
 
     private {
-        void onClick(sfRenderWindow* renderWindow) {
-
+        void onClick(GUIChessboard guiChessboard, sfRenderWindow* renderWindow) {
+            guiChessboard.clearBoardPositions();
+            guiChessboard.addPossibleBoardPositions(_chessPiece.possibleBoardPositions(guiChessboard.chessboard));
         }
 
         bool isMousePositionInBounds(sfVector2i mousePosition) {

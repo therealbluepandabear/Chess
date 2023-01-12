@@ -13,13 +13,14 @@ class GUIChessboard {
         _chessboard = chessboard;
         initGuiChessPieces();
         initChessboardRectangles();
+        initPossibleBoardPositionIndicator();
 
         assert(_chessboardRectangles.length == 64, "_chessboardRectangles has invalid length");
     }
 
     void update(sfRenderWindow* renderWindow, sfEvent event) {
         foreach (GUIChessPiece guiChessPiece; _guiChessPieces) {
-            guiChessPiece.update(renderWindow, event);
+            guiChessPiece.update(this, renderWindow, event);
         }
     }
 
@@ -35,6 +36,24 @@ class GUIChessboard {
         foreach (GUIChessPiece guiChessPiece; _guiChessPieces) {
             guiChessPiece.render(renderWindow);
         }
+
+        foreach (sfVector2i possibleBoardPosition; _possibleBoardPositions) {
+            _possibleBoardPositionIndicator.sfCircleShape_setPosition(sfVector2f(possibleBoardPosition.x * _squareSize + _squareSize / 2 - _possibleBoardPositionIndicator.sfCircleShape_getRadius(), possibleBoardPosition.y * _squareSize + _squareSize / 2 - _possibleBoardPositionIndicator.sfCircleShape_getRadius()));
+            renderWindow.sfRenderWindowExt_draw(_possibleBoardPositionIndicator);
+        }
+    }
+
+    void addPossibleBoardPositions(sfVector2i[] boardPositions) {
+        foreach (sfVector2i boardPosition; boardPositions) {
+            assert(boardPosition.x <= 7 && boardPosition.x >= 0, "Invalid x position");
+            assert(boardPosition.y <= 7 && boardPosition.y >= 0, "Invalid y position");
+
+            _possibleBoardPositions ~= boardPosition;
+        }
+    }
+
+    void clearBoardPositions() {
+        _possibleBoardPositions = _possibleBoardPositions.init;
     }
 
     @property {
@@ -45,9 +64,19 @@ class GUIChessboard {
         GUIChessPiece[] guiChessPieces() {
             return _guiChessPieces;
         }
+
+        Chessboard chessboard() {
+            return _chessboard;
+        }
     }
 
     private {
+        void initPossibleBoardPositionIndicator() {
+            _possibleBoardPositionIndicator = sfCircleShape_create();
+            _possibleBoardPositionIndicator.sfCircleShape_setRadius(10);
+            _possibleBoardPositionIndicator.sfCircleShape_setFillColor(sfGreen);
+        }
+
         void initGuiChessPieces() {
             foreach (ChessPiece chessPiece; _chessboard.chessPieces) {
                 _guiChessPieces ~= new GUIChessPiece(chessPiece, _squareSize);
@@ -89,5 +118,7 @@ class GUIChessboard {
         float _squareSize;
         GUIChessPiece[] _guiChessPieces;
         Chessboard _chessboard;
+        sfVector2i[] _possibleBoardPositions;
+        sfCircleShape* _possibleBoardPositionIndicator;
     }
 }

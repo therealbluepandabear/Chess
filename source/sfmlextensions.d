@@ -2,7 +2,7 @@ module sfmlextensions;
 
 import bindbc.sfml;
 
-enum isDrawable(T) = is(T == sfRectangleShape*) || is(T == sfSprite*);
+enum isDrawable(T) = is(T == sfRectangleShape*) || is(T == sfSprite*) || is(T == sfCircleShape*);
 
 void sfRenderWindowExt_draw(T)(sfRenderWindow* renderWindow, T drawable) {
     import std.format;
@@ -12,6 +12,8 @@ void sfRenderWindowExt_draw(T)(sfRenderWindow* renderWindow, T drawable) {
         renderWindow.sfRenderWindow_drawRectangleShape(drawable, null);
     } else static if (is(T == sfSprite*)) {
         renderWindow.sfRenderWindow_drawSprite(drawable, null);
+    } else static if (is(T == sfCircleShape*)) {
+        renderWindow.sfRenderWindow_drawCircleShape(drawable, null);
     }
 }
 

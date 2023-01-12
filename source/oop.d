@@ -229,7 +229,7 @@ class Chessboard {
 
 abstract class ChessPiece {
     abstract {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard);
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard);
     }
 
     @property {
@@ -261,15 +261,25 @@ abstract class ChessPiece {
 
 class Pawn : ChessPiece {
     override {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
-            return [sfVector2i(_boardPosition.x, _boardPosition.y + 1)];
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
+            sfVector2i[] possibleBoardPositions;
+
+            if (_color == ChessPieceColor.black) {
+                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y + 1);
+                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y + 2);
+            } else {
+                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y - 1);
+                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y - 2);
+            }
+
+            return possibleBoardPositions;
         }
     }
 }
 
 class Rook : ChessPiece {
     override {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
             return [];
         }
     }
@@ -277,7 +287,7 @@ class Rook : ChessPiece {
 
 class Knight : ChessPiece {
     override {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
             return [];
         }
     }
@@ -285,7 +295,7 @@ class Knight : ChessPiece {
 
 class Bishop : ChessPiece {
     override {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
             return [];
         }
     }
@@ -293,7 +303,7 @@ class Bishop : ChessPiece {
 
 class Queen : ChessPiece {
     override {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
             return [];
         }
     }
@@ -301,7 +311,7 @@ class Queen : ChessPiece {
 
 class King : ChessPiece {
     override {
-        sfVector2i[] possibleBoardMoves(Chessboard chessboard) {
+        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
             return [];
         }
     }
