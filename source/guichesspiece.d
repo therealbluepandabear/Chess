@@ -29,7 +29,7 @@ class GUIChessPiece {
 
     private {
         void onClick(sfRenderWindow* renderWindow) {
-            // TODO
+
         }
 
         bool isMousePositionInBounds(sfVector2i mousePosition) {

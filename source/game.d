@@ -15,9 +15,7 @@ class Game {
 
     void update() {
         _window.update();
-        foreach (GUIChessPiece guiChessPiece; _guiChessboard.guiChessPieces) {
-            guiChessPiece.update(_window.renderWindow, _window.event);
-        }
+        _guiChessboard.update(_window.renderWindow, _window.event);
     }
 
     void render() {

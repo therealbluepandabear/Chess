@@ -14,6 +14,12 @@ class GUIChessboard {
         assert(_chessboardRectangles.length == 64, "_chessboardRectangles has invalid length");
     }
 
+    void update(sfRenderWindow* renderWindow, sfEvent event) {
+        foreach (GUIChessPiece guiChessPiece; _guiChessPieces) {
+            guiChessPiece.update(renderWindow, event);
+        }
+    }
+
     void render(sfRenderWindow* renderWindow) {
         assert(_guiChessPieces.length == 32, "_guiChessPieces has invalid length");
 
