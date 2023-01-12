@@ -32,11 +32,8 @@ class Game {
 
     private {
         void initGUIChessboard() {
-            _guiChessboard = new GUIChessboard(_window.windowSize);
             Chessboard chessboard = new Chessboard();
-            foreach (ChessPiece chessPiece; chessboard.chessPieces) {
-                _guiChessboard.addChessPiece(chessPiece);
-            }
+            _guiChessboard = new GUIChessboard(chessboard, _window.windowSize);
         }
 
         Window _window;

@@ -4,11 +4,14 @@ import bindbc.sfml;
 import sfmlextensions;
 import oop;
 import guichesspiece;
+import oop;
 
 class GUIChessboard {
-    this(sfVector2u windowSize) {
+    this(Chessboard chessboard, sfVector2u windowSize) {
         _windowSize = windowSize;
         _squareSize = (cast(float)_windowSize.x) / 8f;
+        _chessboard = chessboard;
+        initGuiChessPieces();
         initChessboardRectangles();
 
         assert(_chessboardRectangles.length == 64, "_chessboardRectangles has invalid length");
@@ -49,6 +52,12 @@ class GUIChessboard {
     }
 
     private {
+        void initGuiChessPieces() {
+            foreach (ChessPiece chessPiece; _chessboard.chessPieces) {
+                _guiChessPieces ~= new GUIChessPiece(chessPiece, _squareSize);
+            }
+        }
+
         void initChessboardRectangles() {
             sfColor fillColor;
             sfColor tan = sfColor_fromRGB(210, 180, 140);
@@ -83,5 +92,6 @@ class GUIChessboard {
         sfVector2u _windowSize;
         float _squareSize;
         GUIChessPiece[] _guiChessPieces;
+        Chessboard _chessboard;
     }
 }
