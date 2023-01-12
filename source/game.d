@@ -35,13 +35,13 @@ class Game {
 
     private {
         void initPieces() {
-            Pawn pawn = new Pawn();
+            ChessPiece pawn = new Pawn();
             for (int i = 0; i < 8; ++i) {
                 pawn.boardPosition = sfVector2i(i, 1);
                 _pieces ~= ChessSpriteLoader.load(pawn, _chessboard.squareSize);
             }
 
-            Rook rook = new Rook();
+            ChessPiece rook = new Rook();
             for (int i = 0; i < 2; ++i) {
                 if (i == 0) {
                     rook.boardPosition(sfVector2i(0, 0));
@@ -50,6 +50,10 @@ class Game {
                 }
                 _pieces ~= ChessSpriteLoader.load(rook, _chessboard.squareSize);
             }
+
+            ChessPiece king = new King();
+            king.boardPosition = sfVector2i(4, 0);
+            _pieces ~= ChessSpriteLoader.load(king, _chessboard.squareSize);
         }
 
         Window _window;
