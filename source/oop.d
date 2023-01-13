@@ -335,14 +335,22 @@ class BishopBoardPositionHandler : BoardPositionHandler {
 class QueenBoardPositionHandler : BoardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
+        rookBoardPositionHandler = new RookBoardPositionHandler(_chessboard, _chessPiece);
+        bishopBoardPositionHandler = new BishopBoardPositionHandler(_chessboard, _chessPiece);
     }
 
     override sfVector2i[] getPossibleBoardPositions() {
         sfVector2i[] possibleBoardPositions;
 
-        possibleBoardPositions ~= forwardY(2);
+        possibleBoardPositions ~= rookBoardPositionHandler.getPossibleBoardPositions();
+        possibleBoardPositions ~= bishopBoardPositionHandler.getPossibleBoardPositions();
 
         return filterBoardPositions(possibleBoardPositions);
+    }
+
+    private {
+        BoardPositionHandler rookBoardPositionHandler;
+        BoardPositionHandler bishopBoardPositionHandler;
     }
 }
 
