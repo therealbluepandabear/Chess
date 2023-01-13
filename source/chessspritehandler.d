@@ -1,13 +1,11 @@
-module chessspriteloader;
+module chessspritehandler;
 
 import bindbc.sfml;
 import oop;
+import sfmlextensions;
 
-final class ChessSpriteLoader {
+final class ChessSpriteHandler {
     static {
-        sfTexture* chessPieceTexture;
-        sfSprite* chessPieceSprite;
-
         sfSprite* load(ChessPiece chessPiece, float size) {
             string path = "assets/";
             if (typeid(chessPiece) == typeid(Pawn)) {
@@ -52,12 +50,16 @@ final class ChessSpriteLoader {
             sfTexture* chessPieceTexture = sfTexture_createFromFile(toStringz(path), null);
             sfSprite* chessPieceSprite = sfSprite_create();
 
-            import sfmlextensions;
             chessPieceSprite.sfSprite_setScale(sfVector2f(size / chessPieceTexture.sfTexture_getSize().x, size / chessPieceTexture.sfTexture_getSize().y));
             chessPieceSprite.sfSprite_setTexture(chessPieceTexture, 0);
             chessPieceSprite.sfSprite_setPosition(sfVector2f(chessPiece.boardPosition.x * size, chessPiece.boardPosition.y * size));
 
             return chessPieceSprite;
+        }
+
+        void refreshPosition(ref sfSprite* chessPieceSprite, ChessPiece chessPiece) {
+            float size = chessPieceSprite.sfSpriteExt_getSize().x;
+            chessPieceSprite.sfSprite_setPosition(sfVector2f(chessPiece.boardPosition.x * size, chessPiece.boardPosition.y * size));
         }
     }
 }

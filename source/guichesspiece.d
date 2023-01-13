@@ -4,12 +4,12 @@ import bindbc.sfml;
 import oop;
 import sfmlextensions;
 import guichessboard;
-import chessspriteloader;
+import chessspritehandler;
 
 class GUIChessPiece {
     this(ChessPiece chessPiece, float size) {
         _chessPiece = chessPiece;
-        _chessSprite = ChessSpriteLoader.load(chessPiece, size);
+        _chessSprite = ChessSpriteHandler.load(chessPiece, size);
     }
 
     void update(GUIChessboard guiChessboard, sfRenderWindow* renderWindow, sfEvent event) {
@@ -29,10 +29,26 @@ class GUIChessPiece {
         renderWindow.sfRenderWindowExt_draw(_chessSprite);
     }
 
+    void refreshPosition() {
+        ChessSpriteHandler.refreshPosition(_chessSprite, _chessPiece);
+    }
+
+    @property {
+        ChessPiece chessPiece() {
+            return _chessPiece;
+        }
+    }
+
     private {
         void onClick(GUIChessboard guiChessboard, sfRenderWindow* renderWindow) {
-            guiChessboard.clearBoardPositions();
-            guiChessboard.addPossibleBoardPositions(_chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getPossibleBoardPositions());
+            guiChessboard.clearPossibleBoardPositions();
+
+            if (!guiChessboard.isMoveMode) {
+                guiChessboard.addPossibleBoardPositions(_chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getPossibleBoardPositions());
+                guiChessboard.selectedGuiChessPiece = this;
+            }
+
+            guiChessboard.toggleIsMoveMode();
         }
 
         bool isMousePositionInBounds(sfVector2i mousePosition) {

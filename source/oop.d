@@ -157,6 +157,24 @@ class Chessboard {
         _chessPieces ~= chessPiece;
     }
 
+    ChessPiece getChessPiece(sfVector2i boardPosition) {
+        foreach (ChessPiece chessPiece; _chessPieces) {
+            if (chessPiece.boardPosition == boardPosition) {
+                return chessPiece;
+            }
+        }
+        return null;
+    }
+
+    void moveChessPiece(sfVector2i boardPosition, sfVector2i newBoardPosition) {
+        foreach (ChessPiece chessPiece; _chessPieces) {
+            if (chessPiece.boardPosition == boardPosition) {
+                chessPiece.boardPosition = sfVector2i(newBoardPosition.x, newBoardPosition.y);
+                break;
+            }
+        }
+    }
+
     @property {
         ChessPiece[] chessPieces() {
             return _chessPieces;
@@ -170,7 +188,7 @@ class Chessboard {
 
 abstract class ChessPiece {
     abstract {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard);
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard);
     }
 
     @property {
@@ -200,7 +218,7 @@ abstract class ChessPiece {
     }
 }
 
-abstract class BoardPositionHandler {
+abstract class ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         _chessboard = chessboard;
         _chessPiece = chessPiece;
@@ -262,7 +280,7 @@ abstract class BoardPositionHandler {
     }
 }
 
-class PawnBoardPositionHandler : BoardPositionHandler {
+class PawnBoardPositionHandler : ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
     }
@@ -277,7 +295,7 @@ class PawnBoardPositionHandler : BoardPositionHandler {
     }
 }
 
-class RookBoardPositionHandler : BoardPositionHandler {
+class RookBoardPositionHandler : ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
     }
@@ -296,7 +314,7 @@ class RookBoardPositionHandler : BoardPositionHandler {
     }
 }
 
-class KnightBoardPositionHandler : BoardPositionHandler {
+class KnightBoardPositionHandler : ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
     }
@@ -313,7 +331,7 @@ class KnightBoardPositionHandler : BoardPositionHandler {
     }
 }
 
-class BishopBoardPositionHandler : BoardPositionHandler {
+class BishopBoardPositionHandler : ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
     }
@@ -332,7 +350,7 @@ class BishopBoardPositionHandler : BoardPositionHandler {
     }
 }
 
-class QueenBoardPositionHandler : BoardPositionHandler {
+class QueenBoardPositionHandler : ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
         rookBoardPositionHandler = new RookBoardPositionHandler(_chessboard, _chessPiece);
@@ -349,12 +367,12 @@ class QueenBoardPositionHandler : BoardPositionHandler {
     }
 
     private {
-        BoardPositionHandler rookBoardPositionHandler;
-        BoardPositionHandler bishopBoardPositionHandler;
+        ChessboardPositionHandler rookBoardPositionHandler;
+        ChessboardPositionHandler bishopBoardPositionHandler;
     }
 }
 
-class KingBoardPositionHandler : BoardPositionHandler {
+class KingBoardPositionHandler : ChessboardPositionHandler {
     this(Chessboard chessboard, ChessPiece chessPiece) {
         super(chessboard, chessPiece);
     }
@@ -377,7 +395,7 @@ class KingBoardPositionHandler : BoardPositionHandler {
 
 class Pawn : ChessPiece {
     override {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
             return new PawnBoardPositionHandler(chessboard, this);
         }
     }
@@ -386,7 +404,7 @@ class Pawn : ChessPiece {
 
 class Rook : ChessPiece {
     override {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
             return new RookBoardPositionHandler(chessboard, this);
         }
     }
@@ -394,7 +412,7 @@ class Rook : ChessPiece {
 
 class Knight : ChessPiece {
     override {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
             return new KnightBoardPositionHandler(chessboard, this);
         }
     }
@@ -402,7 +420,7 @@ class Knight : ChessPiece {
 
 class Bishop : ChessPiece {
     override {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
             return new BishopBoardPositionHandler(chessboard, this);
         }
     }
@@ -410,7 +428,7 @@ class Bishop : ChessPiece {
 
 class Queen : ChessPiece {
     override {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
             return new QueenBoardPositionHandler(chessboard, this);
         }
     }
@@ -418,7 +436,7 @@ class Queen : ChessPiece {
 
 class King : ChessPiece {
     override {
-        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+        ChessboardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
             return new KingBoardPositionHandler(chessboard, this);
         }
     }

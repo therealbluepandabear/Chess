@@ -10,7 +10,7 @@ import guichesspiece;
 class Game {
     this() {
         _window = new Window("Chess", sfVector2u(500, 500));
-        initGUIChessboard();
+        initGuiChessboard();
     }
 
     void update() {
@@ -31,9 +31,8 @@ class Game {
     }
 
     private {
-        void initGUIChessboard() {
-            Chessboard chessboard = new Chessboard();
-            _guiChessboard = new GUIChessboard(chessboard, _window.windowSize);
+        void initGuiChessboard() {
+            _guiChessboard = new GUIChessboard(_window.windowSize);
         }
 
         Window _window;

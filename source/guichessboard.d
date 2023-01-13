@@ -7,10 +7,11 @@ import guichesspiece;
 import oop;
 
 class GUIChessboard {
-    this(Chessboard chessboard, sfVector2u windowSize) {
+    this(sfVector2u windowSize) {
         _windowSize = windowSize;
         _squareSize = (cast(float)_windowSize.x) / 8f;
-        _chessboard = chessboard;
+        _chessboard = new Chessboard();
+
         initGuiChessPieces();
         initChessboardRectangles();
         initPossibleBoardPositionIndicator();
@@ -22,14 +23,25 @@ class GUIChessboard {
         foreach (GUIChessPiece guiChessPiece; _guiChessPieces) {
             guiChessPiece.update(this, renderWindow, event);
         }
+
+        if (_isMoveMode) {
+            sfVector2i boardPosition = mousePositionToBoardPosition(sfMouse_getPositionRenderWindow(renderWindow));
+
+            if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
+                if (event.type == sfEventType.sfEvtMouseButtonPressed) {
+                    _executeGuiChessPieceClick = true;
+                } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeGuiChessPieceClick) {
+                    onBoardPositionClick(boardPosition);
+                    _executeGuiChessPieceClick = false;
+                }
+            }
+        }
     }
 
     void render(sfRenderWindow* renderWindow) {
         assert(_guiChessPieces.length == 32, "_guiChessPieces has invalid length");
 
         foreach (sfRectangleShape* rect; _chessboardRectangles) {
-            assert(rect !is null, "rect cannot be null");
-
             renderWindow.sfRenderWindowExt_draw(rect);
         }
 
@@ -52,7 +64,7 @@ class GUIChessboard {
         }
     }
 
-    void clearBoardPositions() {
+    void clearPossibleBoardPositions() {
         _possibleBoardPositions = _possibleBoardPositions.init;
     }
 
@@ -68,9 +80,30 @@ class GUIChessboard {
         Chessboard chessboard() {
             return _chessboard;
         }
+
+        bool isMoveMode() {
+            return _isMoveMode;
+        }
+
+        void toggleIsMoveMode() {
+            _isMoveMode = !_isMoveMode;
+        }
+
+        void selectedGuiChessPiece(GUIChessPiece selectedGuiChessPiece) {
+            _selectedGuiChessPiece = selectedGuiChessPiece;
+        }
     }
 
     private {
+        sfVector2i mousePositionToBoardPosition(sfVector2i mousePosition) {
+            return sfVector2i(cast(int)(mousePosition.x / _squareSize), cast(int)(mousePosition.y / _squareSize));
+        }
+
+        void onBoardPositionClick(sfVector2i boardPosition) {
+            _chessboard.moveChessPiece(_selectedGuiChessPiece.chessPiece.boardPosition, boardPosition);
+            _selectedGuiChessPiece.refreshPosition();
+        }
+
         void initPossibleBoardPositionIndicator() {
             _possibleBoardPositionIndicator = sfCircleShape_create();
             _possibleBoardPositionIndicator.sfCircleShape_setRadius(10);
@@ -120,5 +153,8 @@ class GUIChessboard {
         Chessboard _chessboard;
         sfVector2i[] _possibleBoardPositions;
         sfCircleShape* _possibleBoardPositionIndicator;
+        GUIChessPiece _selectedGuiChessPiece;
+        bool _isMoveMode;
+        bool _executeGuiChessPieceClick;
     }
 }
