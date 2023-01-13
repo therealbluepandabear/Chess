@@ -157,15 +157,6 @@ class Chessboard {
         _chessPieces ~= chessPiece;
     }
 
-    ChessPiece getChessPiece(sfVector2i boardPosition) {
-        foreach (ChessPiece chessPiece; _chessPieces) {
-            if (chessPiece.boardPosition == boardPosition) {
-                return chessPiece;
-            }
-        }
-        return null;
-    }
-
     void moveChessPiece(sfVector2i boardPosition, sfVector2i newBoardPosition) {
         foreach (ChessPiece chessPiece; _chessPieces) {
             if (chessPiece.boardPosition == boardPosition) {
