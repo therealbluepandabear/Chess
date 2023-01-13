@@ -321,7 +321,12 @@ class BishopBoardPositionHandler : BoardPositionHandler {
     override sfVector2i[] getPossibleBoardPositions() {
         sfVector2i[] possibleBoardPositions;
 
-        possibleBoardPositions ~= forwardY(2);
+        for (int i = 1; i <= 7; ++i) {
+            possibleBoardPositions ~= sfVector2i(leftX(i).x, forwardY(i).y);
+            possibleBoardPositions ~= sfVector2i(rightX(i).x, backY(i).y);
+            possibleBoardPositions ~= sfVector2i(leftX(i).x, backY(i).y);
+            possibleBoardPositions ~= sfVector2i(rightX(i).x, forwardY(i).y);
+        }
 
         return filterBoardPositions(possibleBoardPositions);
     }
