@@ -43,12 +43,13 @@ class GUIChessPiece {
         void onClick(GUIChessboard guiChessboard, sfRenderWindow* renderWindow) {
             guiChessboard.clearPossibleBoardPositions();
 
-            if (!guiChessboard.isMoveMode) {
+            if (!guiChessboard.isMoveMode || guiChessboard.selectedGuiChessPiece != this) {
                 guiChessboard.addPossibleBoardPositions(_chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getPossibleBoardPositions());
                 guiChessboard.selectedGuiChessPiece = this;
+                guiChessboard.isMoveMode = true;
+            } else {
+                guiChessboard.isMoveMode = false;
             }
-
-            guiChessboard.toggleIsMoveMode();
         }
 
         bool isMousePositionInBounds(sfVector2i mousePosition) {

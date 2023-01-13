@@ -81,12 +81,16 @@ class GUIChessboard {
             return _chessboard;
         }
 
+        GUIChessPiece selectedGuiChessPiece() {
+            return _selectedGuiChessPiece;
+        }
+
         bool isMoveMode() {
             return _isMoveMode;
         }
 
-        void toggleIsMoveMode() {
-            _isMoveMode = !_isMoveMode;
+        void isMoveMode(bool isMoveMode) {
+            _isMoveMode = isMoveMode;
         }
 
         void selectedGuiChessPiece(GUIChessPiece selectedGuiChessPiece) {
@@ -102,6 +106,7 @@ class GUIChessboard {
         void onBoardPositionClick(sfVector2i boardPosition) {
             _chessboard.moveChessPiece(_selectedGuiChessPiece.chessPiece.boardPosition, boardPosition);
             _selectedGuiChessPiece.refreshPosition();
+            _possibleBoardPositions = _possibleBoardPositions.init;
         }
 
         void initPossibleBoardPositionIndicator() {
