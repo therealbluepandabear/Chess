@@ -362,7 +362,14 @@ class KingBoardPositionHandler : BoardPositionHandler {
     override sfVector2i[] getPossibleBoardPositions() {
         sfVector2i[] possibleBoardPositions;
 
-        possibleBoardPositions ~= forwardY(2);
+        possibleBoardPositions ~= sfVector2i(leftX(1).x, _chessPiece.boardPosition.y);
+        possibleBoardPositions ~= sfVector2i(rightX(1).x, _chessPiece.boardPosition.y);
+        possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, forwardY(1).y);
+        possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, backY(1).y);
+        possibleBoardPositions ~= sfVector2i(leftX(1).x, forwardY(1).y);
+        possibleBoardPositions ~= sfVector2i(rightX(1).x, backY(1).y);
+        possibleBoardPositions ~= sfVector2i(leftX(1).x, backY(1).y);
+        possibleBoardPositions ~= sfVector2i(rightX(1).x, forwardY(1).y);
 
         return filterBoardPositions(possibleBoardPositions);
     }
