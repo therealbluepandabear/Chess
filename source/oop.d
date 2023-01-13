@@ -255,6 +255,13 @@ abstract class ChessboardPositionHandler {
             return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y + moveBy);
         }
 
+        sfVector2i relativeBoardPosition() {
+            if (_chessPiece.color == ChessPieceColor.black) {
+                return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y);
+            }
+            return sfVector2i(7 - _chessPiece.boardPosition.x, 7 - _chessPiece.boardPosition.y);
+        }
+
         sfVector2i[] filterBoardPositions(sfVector2i[] boardPositions) {
             sfVector2i[] filteredBoardPositions;
 
@@ -281,7 +288,10 @@ class PawnBoardPositionHandler : ChessboardPositionHandler {
         sfVector2i[] possibleBoardPositions;
 
         possibleBoardPositions ~= forwardY(1);
-        possibleBoardPositions ~= forwardY(2);
+
+        if (relativeBoardPosition().y == 1) {
+            possibleBoardPositions ~= forwardY(2);
+        }
 
         return filterBoardPositions(possibleBoardPositions);
     }
