@@ -1,6 +1,7 @@
 module oop;
 
 import bindbc.sfml;
+import std.algorithm.searching : any;
 
 enum ChessPieceColor {
     black, white
@@ -258,7 +259,7 @@ abstract class ChessboardPositionHandler {
             sfVector2i[] filteredBoardPositions;
 
             foreach (sfVector2i boardPosition; boardPositions) {
-                if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
+                if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7 && !_chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
                     filteredBoardPositions ~= boardPosition;
                 }
             }
