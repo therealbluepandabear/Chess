@@ -285,7 +285,12 @@ class RookBoardPositionHandler : BoardPositionHandler {
     override sfVector2i[] getPossibleBoardPositions() {
         sfVector2i[] possibleBoardPositions;
 
-        possibleBoardPositions ~= forwardY(2);
+        for (int i = 1; i <= 7; ++i) {
+            possibleBoardPositions ~= sfVector2i(leftX(i).x, _chessPiece.boardPosition.y);
+            possibleBoardPositions ~= sfVector2i(rightX(i).x, _chessPiece.boardPosition.y);
+            possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, forwardY(i).y);
+            possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, backY(i).y);
+        }
 
         return filterBoardPositions(possibleBoardPositions);
     }
