@@ -4,7 +4,7 @@ import bindbc.sfml;
 import sfmlextensions;
 import oop;
 import guichesspiece;
-import oop;
+import std.algorithm : canFind;
 
 class GUIChessboard {
     this(sfVector2u windowSize) {
@@ -30,7 +30,7 @@ class GUIChessboard {
             if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
                 if (event.type == sfEventType.sfEvtMouseButtonPressed) {
                     _executeGuiChessPieceClick = true;
-                } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeGuiChessPieceClick) {
+                } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeGuiChessPieceClick && _possibleBoardPositions.canFind(boardPosition)) {
                     onBoardPositionClick(boardPosition);
                     _executeGuiChessPieceClick = false;
                 }
