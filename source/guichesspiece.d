@@ -4,6 +4,7 @@ import bindbc.sfml;
 import oop;
 import sfmlextensions;
 import guichessboard;
+import chessspriteloader;
 
 class GUIChessPiece {
     this(ChessPiece chessPiece, float size) {
@@ -31,7 +32,7 @@ class GUIChessPiece {
     private {
         void onClick(GUIChessboard guiChessboard, sfRenderWindow* renderWindow) {
             guiChessboard.clearBoardPositions();
-            guiChessboard.addPossibleBoardPositions(_chessPiece.possibleBoardPositions(guiChessboard.chessboard));
+            guiChessboard.addPossibleBoardPositions(_chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getPossibleBoardPositions());
         }
 
         bool isMousePositionInBounds(sfVector2i mousePosition) {

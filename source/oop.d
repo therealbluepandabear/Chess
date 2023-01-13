@@ -6,65 +6,6 @@ enum ChessPieceColor {
     black, white
 }
 
-final class ChessSpriteLoader {
-    static {
-        sfTexture* chessPieceTexture;
-        sfSprite* chessPieceSprite;
-
-        sfSprite* load(ChessPiece chessPiece, float size) {
-            string path = "assets/";
-            if (typeid(chessPiece) == typeid(Pawn)) {
-                if (chessPiece.color == ChessPieceColor.black) {
-                    path ~= "black_pawn.png";
-                } else {
-                    path ~= "white_pawn.png";
-                }
-            } else if (typeid(chessPiece) == typeid(Rook)) {
-                if (chessPiece.color == ChessPieceColor.black) {
-                    path ~= "black_rook.png";
-                } else {
-                    path ~= "white_rook.png";
-                }
-            } else if (typeid(chessPiece) == typeid(King)) {
-                if (chessPiece.color == ChessPieceColor.black) {
-                    path ~= "black_king.png";
-                } else {
-                    path ~= "white_king.png";
-                }
-            } else if (typeid(chessPiece) == typeid(Queen)) {
-                if (chessPiece.color == ChessPieceColor.black) {
-                    path ~= "black_queen.png";
-                } else {
-                    path ~= "white_queen.png";
-                }
-            } else if (typeid(chessPiece) == typeid(Knight)) {
-                if (chessPiece.color == ChessPieceColor.black) {
-                    path ~= "black_knight.png";
-                } else {
-                    path ~= "white_knight.png";
-                }
-            } else if (typeid(chessPiece) == typeid(Bishop)) {
-                if (chessPiece.color == ChessPieceColor.black) {
-                    path ~= "black_bishop.png";
-                } else {
-                    path ~= "white_bishop.png";
-                }
-            }
-
-            import std.string;
-            sfTexture* chessPieceTexture = sfTexture_createFromFile(toStringz(path), null);
-            sfSprite* chessPieceSprite = sfSprite_create();
-
-            import sfmlextensions;
-            chessPieceSprite.sfSprite_setScale(sfVector2f(size / chessPieceTexture.sfTexture_getSize().x, size / chessPieceTexture.sfTexture_getSize().y));
-            chessPieceSprite.sfSprite_setTexture(chessPieceTexture, 0);
-            chessPieceSprite.sfSprite_setPosition(sfVector2f(chessPiece.boardPosition.x * size, chessPiece.boardPosition.y * size));
-
-            return chessPieceSprite;
-        }
-    }
-}
-
 class ChessboardOrganizer {
     this(Chessboard chessboard) {
         _chessboard = chessboard;
@@ -229,7 +170,7 @@ class Chessboard {
 
 abstract class ChessPiece {
     abstract {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard);
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard);
     }
 
     @property {
@@ -259,60 +200,198 @@ abstract class ChessPiece {
     }
 }
 
-class Pawn : ChessPiece {
-    override {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
-            sfVector2i[] possibleBoardPositions;
+abstract class BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        _chessboard = chessboard;
+        _chessPiece = chessPiece;
+    }
 
-            if (_color == ChessPieceColor.black) {
-                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y + 1);
-                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y + 2);
-            } else {
-                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y - 1);
-                possibleBoardPositions ~= sfVector2i(_boardPosition.x, _boardPosition.y - 2);
+    abstract sfVector2i[] getPossibleBoardPositions();
+
+    private {
+        sfVector2i leftX(int moveBy = 1) {
+            assert(moveBy >= 1, "Invalid moveBy");
+
+            if (_chessPiece.color == ChessPieceColor.black) {
+                return sfVector2i(_chessPiece.boardPosition.x + moveBy, _chessPiece.boardPosition.y);
+            }
+            return sfVector2i(_chessPiece.boardPosition.x - moveBy, _chessPiece.boardPosition.y);
+        }
+
+        sfVector2i rightX(int moveBy = 1) {
+            assert(moveBy >= 1, "Invalid moveBy");
+
+            if (_chessPiece.color == ChessPieceColor.black) {
+                return sfVector2i(_chessPiece.boardPosition.x - moveBy, _chessPiece.boardPosition.y);
+            }
+            return sfVector2i(_chessPiece.boardPosition.x + moveBy, _chessPiece.boardPosition.y);
+        }
+
+        sfVector2i forwardY(int moveBy = 1) {
+            assert(moveBy >= 1, "Invalid moveBy");
+
+            if (_chessPiece.color == ChessPieceColor.black) {
+                return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y + moveBy);
+            }
+            return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y - moveBy);
+        }
+
+        sfVector2i backY(int moveBy = 1) {
+            assert(moveBy >= 1, "Invalid moveBy");
+
+            if (_chessPiece.color == ChessPieceColor.black) {
+                return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y - moveBy);
+            }
+            return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y + moveBy);
+        }
+
+        sfVector2i[] filterBoardPositions(sfVector2i[] boardPositions) {
+            sfVector2i[] filteredBoardPositions;
+
+            foreach (sfVector2i boardPosition; boardPositions) {
+                if (boardPosition.x >= 0 && !boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
+                    filteredBoardPositions ~= boardPosition;
+                }
             }
 
-            return possibleBoardPositions;
+            return filteredBoardPositions;
+        }
+
+        Chessboard _chessboard;
+        ChessPiece _chessPiece;
+    }
+}
+
+class PawnBoardPositionHandler : BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        super(chessboard, chessPiece);
+    }
+
+    override sfVector2i[] getPossibleBoardPositions() {
+        sfVector2i[] possibleBoardPositions;
+
+        possibleBoardPositions ~= forwardY(1);
+        possibleBoardPositions ~= forwardY(2);
+
+        return filterBoardPositions(possibleBoardPositions);
+    }
+}
+
+class RookBoardPositionHandler : BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        super(chessboard, chessPiece);
+    }
+
+    override sfVector2i[] getPossibleBoardPositions() {
+        sfVector2i[] possibleBoardPositions;
+
+        possibleBoardPositions ~= forwardY(2);
+
+        return filterBoardPositions(possibleBoardPositions);
+    }
+}
+
+class KnightBoardPositionHandler : BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        super(chessboard, chessPiece);
+    }
+
+    override sfVector2i[] getPossibleBoardPositions() {
+        sfVector2i[] possibleBoardPositions;
+
+        possibleBoardPositions ~= sfVector2i(leftX(1).x, forwardY(2).y);
+
+        return filterBoardPositions(possibleBoardPositions);
+    }
+}
+
+class BishopBoardPositionHandler : BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        super(chessboard, chessPiece);
+    }
+
+    override sfVector2i[] getPossibleBoardPositions() {
+        sfVector2i[] possibleBoardPositions;
+
+        possibleBoardPositions ~= forwardY(2);
+
+        return filterBoardPositions(possibleBoardPositions);
+    }
+}
+
+class QueenBoardPositionHandler : BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        super(chessboard, chessPiece);
+    }
+
+    override sfVector2i[] getPossibleBoardPositions() {
+        sfVector2i[] possibleBoardPositions;
+
+        possibleBoardPositions ~= forwardY(2);
+
+        return filterBoardPositions(possibleBoardPositions);
+    }
+}
+
+class KingBoardPositionHandler : BoardPositionHandler {
+    this(Chessboard chessboard, ChessPiece chessPiece) {
+        super(chessboard, chessPiece);
+    }
+
+    override sfVector2i[] getPossibleBoardPositions() {
+        sfVector2i[] possibleBoardPositions;
+
+        possibleBoardPositions ~= forwardY(2);
+
+        return filterBoardPositions(possibleBoardPositions);
+    }
+}
+
+class Pawn : ChessPiece {
+    override {
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+            return new PawnBoardPositionHandler(chessboard, this);
         }
     }
 }
 
+
 class Rook : ChessPiece {
     override {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
-            return [];
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+            return new RookBoardPositionHandler(chessboard, this);
         }
     }
 }
 
 class Knight : ChessPiece {
     override {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
-            return [];
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+            return new KnightBoardPositionHandler(chessboard, this);
         }
     }
 }
 
 class Bishop : ChessPiece {
     override {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
-            return [];
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+            return new BishopBoardPositionHandler(chessboard, this);
         }
     }
 }
 
 class Queen : ChessPiece {
     override {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
-            return [];
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+            return new QueenBoardPositionHandler(chessboard, this);
         }
     }
 }
 
 class King : ChessPiece {
     override {
-        sfVector2i[] possibleBoardPositions(Chessboard chessboard) {
-            return [];
+        BoardPositionHandler getBoardPositionHandler(Chessboard chessboard) {
+            return new KingBoardPositionHandler(chessboard, this);
         }
     }
 }
