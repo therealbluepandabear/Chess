@@ -249,7 +249,7 @@ abstract class BoardPositionHandler {
             sfVector2i[] filteredBoardPositions;
 
             foreach (sfVector2i boardPosition; boardPositions) {
-                if (boardPosition.x >= 0 && !boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
+                if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
                     filteredBoardPositions ~= boardPosition;
                 }
             }
@@ -300,6 +300,9 @@ class KnightBoardPositionHandler : BoardPositionHandler {
         sfVector2i[] possibleBoardPositions;
 
         possibleBoardPositions ~= sfVector2i(leftX(1).x, forwardY(2).y);
+        possibleBoardPositions ~= sfVector2i(rightX(1).x, forwardY(2).y);
+        possibleBoardPositions ~= sfVector2i(leftX(2).x, forwardY(1).y);
+        possibleBoardPositions ~= sfVector2i(rightX(2).x, forwardY(1).y);
 
         return filterBoardPositions(possibleBoardPositions);
     }
