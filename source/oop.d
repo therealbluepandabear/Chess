@@ -1,7 +1,7 @@
 module oop;
 
 import bindbc.sfml;
-import std.algorithm.searching : any;
+import std.algorithm;
 
 enum ChessPieceColor {
     black, white
@@ -234,17 +234,37 @@ abstract class ChessboardPositionHandler {
             sfVector2i[] finalizeToBoardPositions() {
                 sfVector2i[] boardPositions;
 
-                foreach (Route route; routes) {
+                foreach (indx, Route route; routes) {
+                    trimRouteIfPieceJumpedOver(route);
+
                     foreach (sfVector2i boardPosition; route.boardPositions) {
                         if (boardPosition.x >= 0 && boardPosition.x <= 7 &&
-                            boardPosition.y >= 0 && boardPosition.y <= 7 &&
-                            !outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                        boardPosition.y >= 0 && boardPosition.y <= 7 &&
+                        !outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
                             boardPositions ~= boardPosition;
                         }
                     }
                 }
 
                 return boardPositions;
+            }
+
+            private {
+                void trimRouteIfPieceJumpedOver(ref Route route) {
+                    if (typeid(outer._chessPiece) != typeid(Knight)) {
+                        sfVector2i[] trimmedBoardPositions;
+
+                        foreach (sfVector2i boardPosition; route.boardPositions) {
+                            if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                                trimmedBoardPositions ~= boardPosition;
+                            } else {
+                                break;
+                            }
+                        }
+
+                        route.boardPositions = trimmedBoardPositions;
+                    }
+                }
             }
         }
 
