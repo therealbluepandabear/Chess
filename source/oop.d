@@ -338,12 +338,16 @@ class KnightBoardPositionHandler : ChessboardPositionHandler {
     }
 
     protected override RouteContainer getPossibleBoardRoutes() {
-        Route[4] routes;
+        Route[8] routes;
 
         routes[0].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.forward, 2).y);
         routes[1].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 2).y);
         routes[2].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 2).x, getMovedPosition(MoveType.forward, 1).y);
         routes[3].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 2).x, getMovedPosition(MoveType.forward, 1).y);
+        routes[4].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.back, 2).y);
+        routes[5].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.back, 2).y);
+        routes[6].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 2).x, getMovedPosition(MoveType.back, 1).y);
+        routes[7].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 2).x, getMovedPosition(MoveType.back, 1).y);
 
         return createRouteContainer(routes.dup);
     }
