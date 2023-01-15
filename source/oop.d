@@ -216,9 +216,33 @@ abstract class ChessboardPositionHandler {
         _chessPiece = chessPiece;
     }
 
-    abstract sfVector2i[] getPossibleBoardPositions();
+    protected abstract RouteContainer getPossibleBoardRoutes();
+
+    sfVector2i[] getPossibleBoardPositions() {
+        return filterBoardPositions(getPossibleBoardRoutes().finalizeToBoardPositions());
+    }
 
     private {
+        struct Route {
+            sfVector2i[] boardPositions;
+        }
+
+        struct RouteContainer {
+            Route[] routes;
+
+            sfVector2i[] finalizeToBoardPositions() {
+                sfVector2i[] boardPositions;
+
+                foreach (Route route; routes) {
+                    foreach (sfVector2i boardPosition; route.boardPositions) {
+                        boardPositions ~= boardPosition;
+                    }
+                }
+
+                return boardPositions;
+            }
+        }
+
         sfVector2i leftX(int moveBy = 1) {
             assert(moveBy >= 1, "Invalid moveBy");
 
@@ -286,16 +310,15 @@ class PawnBoardPositionHandler : ChessboardPositionHandler {
         super(chessboard, chessPiece);
     }
 
-    override sfVector2i[] getPossibleBoardPositions() {
-        sfVector2i[] possibleBoardPositions;
-
-        possibleBoardPositions ~= forwardY(1);
+    protected override RouteContainer getPossibleBoardRoutes() {
+        Route route;
+        route.boardPositions ~= forwardY(1);
 
         if (relativeY == 1) {
-            possibleBoardPositions ~= forwardY(2);
+            route.boardPositions ~= forwardY(2);
         }
 
-        return filterBoardPositions(possibleBoardPositions);
+        return RouteContainer([route]);
     }
 }
 
@@ -304,17 +327,17 @@ class RookBoardPositionHandler : ChessboardPositionHandler {
         super(chessboard, chessPiece);
     }
 
-    override sfVector2i[] getPossibleBoardPositions() {
-        sfVector2i[] possibleBoardPositions;
+    protected override RouteContainer getPossibleBoardRoutes() {
+        Route[4] routes;
 
         for (int i = 1; i <= 7; ++i) {
-            possibleBoardPositions ~= sfVector2i(leftX(i).x, _chessPiece.boardPosition.y);
-            possibleBoardPositions ~= sfVector2i(rightX(i).x, _chessPiece.boardPosition.y);
-            possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, forwardY(i).y);
-            possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, backY(i).y);
+            routes[0].boardPositions ~= sfVector2i(leftX(i).x, _chessPiece.boardPosition.y);
+            routes[1].boardPositions ~= sfVector2i(rightX(i).x, _chessPiece.boardPosition.y);
+            routes[2].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, forwardY(i).y);
+            routes[3].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, backY(i).y);
         }
 
-        return filterBoardPositions(possibleBoardPositions);
+        return RouteContainer(routes.dup);
     }
 }
 
@@ -323,15 +346,15 @@ class KnightBoardPositionHandler : ChessboardPositionHandler {
         super(chessboard, chessPiece);
     }
 
-    override sfVector2i[] getPossibleBoardPositions() {
-        sfVector2i[] possibleBoardPositions;
+    protected override RouteContainer getPossibleBoardRoutes() {
+        Route[4] routes;
 
-        possibleBoardPositions ~= sfVector2i(leftX(1).x, forwardY(2).y);
-        possibleBoardPositions ~= sfVector2i(rightX(1).x, forwardY(2).y);
-        possibleBoardPositions ~= sfVector2i(leftX(2).x, forwardY(1).y);
-        possibleBoardPositions ~= sfVector2i(rightX(2).x, forwardY(1).y);
+        routes[0].boardPositions ~= sfVector2i(leftX(1).x, forwardY(2).y);
+        routes[1].boardPositions ~= sfVector2i(rightX(1).x, forwardY(2).y);
+        routes[2].boardPositions ~= sfVector2i(leftX(2).x, forwardY(1).y);
+        routes[3].boardPositions ~= sfVector2i(rightX(2).x, forwardY(1).y);
 
-        return filterBoardPositions(possibleBoardPositions);
+        return RouteContainer(routes.dup);
     }
 }
 
@@ -340,17 +363,17 @@ class BishopBoardPositionHandler : ChessboardPositionHandler {
         super(chessboard, chessPiece);
     }
 
-    override sfVector2i[] getPossibleBoardPositions() {
-        sfVector2i[] possibleBoardPositions;
+    protected override RouteContainer getPossibleBoardRoutes() {
+        Route[4] routes;
 
         for (int i = 1; i <= 7; ++i) {
-            possibleBoardPositions ~= sfVector2i(leftX(i).x, forwardY(i).y);
-            possibleBoardPositions ~= sfVector2i(rightX(i).x, backY(i).y);
-            possibleBoardPositions ~= sfVector2i(leftX(i).x, backY(i).y);
-            possibleBoardPositions ~= sfVector2i(rightX(i).x, forwardY(i).y);
+            routes[0].boardPositions ~= sfVector2i(leftX(i).x, forwardY(i).y);
+            routes[1].boardPositions ~= sfVector2i(rightX(i).x, backY(i).y);
+            routes[2].boardPositions ~= sfVector2i(leftX(i).x, backY(i).y);
+            routes[3].boardPositions ~= sfVector2i(rightX(i).x, forwardY(i).y);
         }
 
-        return filterBoardPositions(possibleBoardPositions);
+        return RouteContainer(routes.dup);
     }
 }
 
@@ -361,13 +384,13 @@ class QueenBoardPositionHandler : ChessboardPositionHandler {
         bishopBoardPositionHandler = new BishopBoardPositionHandler(_chessboard, _chessPiece);
     }
 
-    override sfVector2i[] getPossibleBoardPositions() {
-        sfVector2i[] possibleBoardPositions;
+    protected override RouteContainer getPossibleBoardRoutes() {
+        Route[] routes;
 
-        possibleBoardPositions ~= rookBoardPositionHandler.getPossibleBoardPositions();
-        possibleBoardPositions ~= bishopBoardPositionHandler.getPossibleBoardPositions();
+        routes ~= rookBoardPositionHandler.getPossibleBoardRoutes().routes;
+        routes ~= bishopBoardPositionHandler.getPossibleBoardRoutes().routes;
 
-        return filterBoardPositions(possibleBoardPositions);
+        return RouteContainer(routes);
     }
 
     private {
@@ -381,19 +404,19 @@ class KingBoardPositionHandler : ChessboardPositionHandler {
         super(chessboard, chessPiece);
     }
 
-    override sfVector2i[] getPossibleBoardPositions() {
-        sfVector2i[] possibleBoardPositions;
+    protected override RouteContainer getPossibleBoardRoutes() {
+        Route[] routes;
 
-        possibleBoardPositions ~= sfVector2i(leftX(1).x, _chessPiece.boardPosition.y);
-        possibleBoardPositions ~= sfVector2i(rightX(1).x, _chessPiece.boardPosition.y);
-        possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, forwardY(1).y);
-        possibleBoardPositions ~= sfVector2i(_chessPiece.boardPosition.x, backY(1).y);
-        possibleBoardPositions ~= sfVector2i(leftX(1).x, forwardY(1).y);
-        possibleBoardPositions ~= sfVector2i(rightX(1).x, backY(1).y);
-        possibleBoardPositions ~= sfVector2i(leftX(1).x, backY(1).y);
-        possibleBoardPositions ~= sfVector2i(rightX(1).x, forwardY(1).y);
+        routes ~= Route([sfVector2i(leftX(1).x, _chessPiece.boardPosition.y)]);
+        routes ~= Route([sfVector2i(rightX(1).x, _chessPiece.boardPosition.y)]);
+        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, forwardY(1).y)]);
+        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, backY(1).y)]);
+        routes ~= Route([sfVector2i(leftX(1).x, forwardY(1).y)]);
+        routes ~= Route([sfVector2i(rightX(1).x, backY(1).y)]);
+        routes ~= Route([sfVector2i(leftX(1).x, backY(1).y)]);
+        routes ~= Route([sfVector2i(rightX(1).x, forwardY(1).y)]);
 
-        return filterBoardPositions(possibleBoardPositions);
+        return RouteContainer(routes);
     }
 }
 
