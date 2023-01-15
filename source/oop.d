@@ -219,7 +219,7 @@ abstract class ChessboardPositionHandler {
     protected abstract RouteContainer getPossibleBoardRoutes();
 
     sfVector2i[] getPossibleBoardPositions() {
-        return filterBoardPositions(getPossibleBoardRoutes().finalizeToBoardPositions());
+        return getPossibleBoardRoutes().finalizeToBoardPositions();
     }
 
     private {
@@ -228,6 +228,7 @@ abstract class ChessboardPositionHandler {
         }
 
         struct RouteContainer {
+            ChessboardPositionHandler outer;
             Route[] routes;
 
             sfVector2i[] finalizeToBoardPositions() {
@@ -235,12 +236,20 @@ abstract class ChessboardPositionHandler {
 
                 foreach (Route route; routes) {
                     foreach (sfVector2i boardPosition; route.boardPositions) {
-                        boardPositions ~= boardPosition;
+                        if (boardPosition.x >= 0 && boardPosition.x <= 7 &&
+                            boardPosition.y >= 0 && boardPosition.y <= 7 &&
+                            !outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                            boardPositions ~= boardPosition;
+                        }
                     }
                 }
 
                 return boardPositions;
             }
+        }
+
+        RouteContainer createRouteContainer(Route[] routes...) {
+            return RouteContainer(this, routes);
         }
 
         enum MoveType {
@@ -273,18 +282,6 @@ abstract class ChessboardPositionHandler {
             return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y + moveBy);
         }
 
-        sfVector2i[] filterBoardPositions(sfVector2i[] boardPositions) {
-            sfVector2i[] filteredBoardPositions;
-
-            foreach (sfVector2i boardPosition; boardPositions) {
-                if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7 && !_chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
-                    filteredBoardPositions ~= boardPosition;
-                }
-            }
-
-            return filteredBoardPositions;
-        }
-
         Chessboard _chessboard;
         ChessPiece _chessPiece;
     }
@@ -312,7 +309,7 @@ class PawnBoardPositionHandler : ChessboardPositionHandler {
             route.boardPositions ~=  getMovedPosition(MoveType.forward, 2);
         }
 
-        return RouteContainer([route]);
+        return createRouteContainer(route);
     }
 }
 
@@ -331,7 +328,7 @@ class RookBoardPositionHandler : ChessboardPositionHandler {
             routes[3].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.back, i).y);
         }
 
-        return RouteContainer(routes.dup);
+        return createRouteContainer(routes.dup);
     }
 }
 
@@ -348,7 +345,7 @@ class KnightBoardPositionHandler : ChessboardPositionHandler {
         routes[2].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 2).x, getMovedPosition(MoveType.forward, 1).y);
         routes[3].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 2).x, getMovedPosition(MoveType.forward, 1).y);
 
-        return RouteContainer(routes.dup);
+        return createRouteContainer(routes.dup);
     }
 }
 
@@ -367,7 +364,7 @@ class BishopBoardPositionHandler : ChessboardPositionHandler {
             routes[3].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, i).x, getMovedPosition(MoveType.forward, i).y);
         }
 
-        return RouteContainer(routes.dup);
+        return createRouteContainer(routes.dup);
     }
 }
 
@@ -384,7 +381,7 @@ class QueenBoardPositionHandler : ChessboardPositionHandler {
         routes ~= rookBoardPositionHandler.getPossibleBoardRoutes().routes;
         routes ~= bishopBoardPositionHandler.getPossibleBoardRoutes().routes;
 
-        return RouteContainer(routes);
+        return createRouteContainer(routes);
     }
 
     private {
@@ -410,7 +407,7 @@ class KingBoardPositionHandler : ChessboardPositionHandler {
         routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.back, 1).y)]);
         routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 1).y)]);
 
-        return RouteContainer(routes);
+        return createRouteContainer(routes);
     }
 }
 
