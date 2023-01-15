@@ -243,39 +243,33 @@ abstract class ChessboardPositionHandler {
             }
         }
 
-        sfVector2i leftX(int moveBy = 1) {
-            assert(moveBy >= 1, "Invalid moveBy");
-
-            if (_chessPiece.color == ChessPieceColor.black) {
-                return sfVector2i(_chessPiece.boardPosition.x + moveBy, _chessPiece.boardPosition.y);
-            }
-            return sfVector2i(_chessPiece.boardPosition.x - moveBy, _chessPiece.boardPosition.y);
+        enum MoveType {
+            forward, back, left, right
         }
 
-        sfVector2i rightX(int moveBy = 1) {
+        sfVector2i getMovedPosition(MoveType moveType, int moveBy) {
             assert(moveBy >= 1, "Invalid moveBy");
 
             if (_chessPiece.color == ChessPieceColor.black) {
-                return sfVector2i(_chessPiece.boardPosition.x - moveBy, _chessPiece.boardPosition.y);
-            }
-            return sfVector2i(_chessPiece.boardPosition.x + moveBy, _chessPiece.boardPosition.y);
-        }
+                if (moveType == MoveType.right || moveType == MoveType.back) {
+                    moveBy = -moveBy;
+                }
 
-        sfVector2i forwardY(int moveBy = 1) {
-            assert(moveBy >= 1, "Invalid moveBy");
+                if (moveType == MoveType.left || moveType == MoveType.right) {
+                    return sfVector2i(_chessPiece.boardPosition.x + moveBy, _chessPiece.boardPosition.y);
+                }
 
-            if (_chessPiece.color == ChessPieceColor.black) {
                 return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y + moveBy);
             }
-            return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y - moveBy);
-        }
 
-        sfVector2i backY(int moveBy = 1) {
-            assert(moveBy >= 1, "Invalid moveBy");
-
-            if (_chessPiece.color == ChessPieceColor.black) {
-                return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y - moveBy);
+            if (moveType == MoveType.left || moveType == MoveType.forward) {
+                moveBy = -moveBy;
             }
+
+            if (moveType == MoveType.left || moveType == MoveType.right) {
+                return sfVector2i(_chessPiece.boardPosition.x + moveBy, _chessPiece.boardPosition.y);
+            }
+
             return sfVector2i(_chessPiece.boardPosition.x, _chessPiece.boardPosition.y + moveBy);
         }
 
@@ -312,10 +306,10 @@ class PawnBoardPositionHandler : ChessboardPositionHandler {
 
     protected override RouteContainer getPossibleBoardRoutes() {
         Route route;
-        route.boardPositions ~= forwardY(1);
+        route.boardPositions ~= getMovedPosition(MoveType.forward, 1);
 
         if (relativeY == 1) {
-            route.boardPositions ~= forwardY(2);
+            route.boardPositions ~=  getMovedPosition(MoveType.forward, 2);
         }
 
         return RouteContainer([route]);
@@ -331,10 +325,10 @@ class RookBoardPositionHandler : ChessboardPositionHandler {
         Route[4] routes;
 
         for (int i = 1; i <= 7; ++i) {
-            routes[0].boardPositions ~= sfVector2i(leftX(i).x, _chessPiece.boardPosition.y);
-            routes[1].boardPositions ~= sfVector2i(rightX(i).x, _chessPiece.boardPosition.y);
-            routes[2].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, forwardY(i).y);
-            routes[3].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, backY(i).y);
+            routes[0].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, i).x, _chessPiece.boardPosition.y);
+            routes[1].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, i).x, _chessPiece.boardPosition.y);
+            routes[2].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.forward, i).y);
+            routes[3].boardPositions ~= sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.back, i).y);
         }
 
         return RouteContainer(routes.dup);
@@ -349,10 +343,10 @@ class KnightBoardPositionHandler : ChessboardPositionHandler {
     protected override RouteContainer getPossibleBoardRoutes() {
         Route[4] routes;
 
-        routes[0].boardPositions ~= sfVector2i(leftX(1).x, forwardY(2).y);
-        routes[1].boardPositions ~= sfVector2i(rightX(1).x, forwardY(2).y);
-        routes[2].boardPositions ~= sfVector2i(leftX(2).x, forwardY(1).y);
-        routes[3].boardPositions ~= sfVector2i(rightX(2).x, forwardY(1).y);
+        routes[0].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.forward, 2).y);
+        routes[1].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 2).y);
+        routes[2].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, 2).x, getMovedPosition(MoveType.forward, 1).y);
+        routes[3].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, 2).x, getMovedPosition(MoveType.forward, 1).y);
 
         return RouteContainer(routes.dup);
     }
@@ -367,10 +361,10 @@ class BishopBoardPositionHandler : ChessboardPositionHandler {
         Route[4] routes;
 
         for (int i = 1; i <= 7; ++i) {
-            routes[0].boardPositions ~= sfVector2i(leftX(i).x, forwardY(i).y);
-            routes[1].boardPositions ~= sfVector2i(rightX(i).x, backY(i).y);
-            routes[2].boardPositions ~= sfVector2i(leftX(i).x, backY(i).y);
-            routes[3].boardPositions ~= sfVector2i(rightX(i).x, forwardY(i).y);
+            routes[0].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, i).x, getMovedPosition(MoveType.forward, i).y);
+            routes[1].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, i).x, getMovedPosition(MoveType.back, i).y);
+            routes[2].boardPositions ~= sfVector2i(getMovedPosition(MoveType.left, i).x, getMovedPosition(MoveType.back, i).y);
+            routes[3].boardPositions ~= sfVector2i(getMovedPosition(MoveType.right, i).x, getMovedPosition(MoveType.forward, i).y);
         }
 
         return RouteContainer(routes.dup);
@@ -407,14 +401,14 @@ class KingBoardPositionHandler : ChessboardPositionHandler {
     protected override RouteContainer getPossibleBoardRoutes() {
         Route[] routes;
 
-        routes ~= Route([sfVector2i(leftX(1).x, _chessPiece.boardPosition.y)]);
-        routes ~= Route([sfVector2i(rightX(1).x, _chessPiece.boardPosition.y)]);
-        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, forwardY(1).y)]);
-        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, backY(1).y)]);
-        routes ~= Route([sfVector2i(leftX(1).x, forwardY(1).y)]);
-        routes ~= Route([sfVector2i(rightX(1).x, backY(1).y)]);
-        routes ~= Route([sfVector2i(leftX(1).x, backY(1).y)]);
-        routes ~= Route([sfVector2i(rightX(1).x, forwardY(1).y)]);
+        routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, _chessPiece.boardPosition.y)]);
+        routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, _chessPiece.boardPosition.y)]);
+        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.forward, 1).y)]);
+        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.back, 1).y)]);
+        routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.forward, 1).y)]);
+        routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.back, 1).y)]);
+        routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.back, 1).y)]);
+        routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 1).y)]);
 
         return RouteContainer(routes);
     }
