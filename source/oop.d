@@ -269,7 +269,8 @@ abstract class ChessboardPositionHandler {
                 foreach (sfVector2i boardPosition; boardPositions) {
                     ChessPiece chessPieceAtPosition = outer._chessboard.getChessPiece(boardPosition);
 
-                    if (chessPieceAtPosition !is null) {
+                    if (chessPieceAtPosition !is null &&
+                        chessPieceAtPosition.color != outer._chessPiece.color) {
                         capturableInfo[boardPosition] = chessPieceAtPosition;
                     }
                 }
@@ -282,7 +283,7 @@ abstract class ChessboardPositionHandler {
                     sfVector2i[] trimmedBoardPositions;
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
-                        if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                        if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color == outer._chessPiece.color)) {
                             trimmedBoardPositions ~= boardPosition;
                         } else {
                             break;

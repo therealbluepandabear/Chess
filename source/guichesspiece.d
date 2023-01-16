@@ -47,6 +47,7 @@ class GUIChessPiece {
                 ChessboardPositionHandler.RouteInfo routeInfo = _chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getRouteInfo();
 
                 guiChessboard.addPossibleBoardPositions(routeInfo.possibleBoardPositions);
+                guiChessboard.addCapturableBoardPositions(routeInfo.capturableInfo.keys);
                 guiChessboard.selectedGuiChessPiece = this;
                 guiChessboard.isMoveMode = true;
             } else {
