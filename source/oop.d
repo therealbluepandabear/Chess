@@ -2,6 +2,7 @@ module oop;
 
 import bindbc.sfml;
 import std.algorithm;
+import std.typecons;
 
 enum ChessPieceColor {
     black, white
@@ -158,6 +159,15 @@ class Chessboard {
         _chessPieces ~= chessPiece;
     }
 
+    ChessPiece getChessPiece(sfVector2i boardPosition) {
+        foreach (ChessPiece chessPiece; _chessPieces) {
+            if (chessPiece.boardPosition == boardPosition) {
+                return chessPiece;
+            }
+        }
+        return null;
+    }
+
     void moveChessPiece(sfVector2i boardPosition, sfVector2i newBoardPosition) {
         foreach (ChessPiece chessPiece; _chessPieces) {
             if (chessPiece.boardPosition == boardPosition) {
@@ -218,8 +228,13 @@ abstract class ChessboardPositionHandler {
 
     protected abstract RouteContainer getPossibleBoardRoutes();
 
-    sfVector2i[] getPossibleBoardPositions() {
-        return getPossibleBoardRoutes().finalizeToBoardPositions();
+    RouteInfo getRouteInfo() {
+        return getPossibleBoardRoutes().getRouteInfo();
+    }
+
+    struct RouteInfo {
+        sfVector2i[] possibleBoardPositions;
+        ChessPiece[sfVector2i] capturableInfo;
     }
 
     private {
@@ -235,7 +250,7 @@ abstract class ChessboardPositionHandler {
             ChessboardPositionHandler outer;
             Route[] routes;
 
-            sfVector2i[] finalizeToBoardPositions() {
+            RouteInfo getRouteInfo() {
                 sfVector2i[] boardPositions;
 
                 foreach (Route route; routes) {
@@ -249,7 +264,17 @@ abstract class ChessboardPositionHandler {
                     }
                 }
 
-                return boardPositions;
+                ChessPiece[sfVector2i] capturableInfo;
+
+                foreach (sfVector2i boardPosition; boardPositions) {
+                    ChessPiece chessPieceAtPosition = outer._chessboard.getChessPiece(boardPosition);
+
+                    if (chessPieceAtPosition !is null) {
+                        capturableInfo[boardPosition] = chessPieceAtPosition;
+                    }
+                }
+
+                return RouteInfo(boardPositions, capturableInfo);
             }
 
             private {

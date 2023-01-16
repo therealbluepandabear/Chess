@@ -44,7 +44,9 @@ class GUIChessPiece {
             guiChessboard.clearPossibleBoardPositions();
 
             if (!guiChessboard.isMoveMode || guiChessboard.selectedGuiChessPiece != this) {
-                guiChessboard.addPossibleBoardPositions(_chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getPossibleBoardPositions());
+                ChessboardPositionHandler.RouteInfo routeInfo = _chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getRouteInfo();
+
+                guiChessboard.addPossibleBoardPositions(routeInfo.possibleBoardPositions);
                 guiChessboard.selectedGuiChessPiece = this;
                 guiChessboard.isMoveMode = true;
             } else {
