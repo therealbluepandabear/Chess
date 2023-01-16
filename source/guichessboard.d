@@ -11,6 +11,7 @@ class GUIChessboard {
         _windowSize = windowSize;
         _squareSize = (cast(float)_windowSize.x) / 8f;
         _chessboard = new Chessboard();
+        _chessboard.connect(&watchChessboard);
 
         initGuiChessPieces();
         initChessboardRectangles();
@@ -62,15 +63,11 @@ class GUIChessboard {
     }
 
     void addPossibleBoardPositions(sfVector2i[] boardPositions) {
-        foreach (sfVector2i boardPosition; boardPositions) {
-            _possibleBoardPositions ~= boardPosition;
-        }
+        _possibleBoardPositions ~= boardPositions;
     }
 
     void addCapturableBoardPositions(sfVector2i[] boardPositions) {
-        foreach (sfVector2i boardPosition; boardPositions) {
-            _capturableBoardPositions ~= boardPosition;
-        }
+        _capturableBoardPositions ~= boardPositions;
     }
 
     void clearBoardPositions() {
@@ -109,13 +106,19 @@ class GUIChessboard {
     }
 
     private {
+        void watchChessboard(Chessboard.ChessboardEvent chessboardEvent, ChessPiece chessPiece) {
+            if (chessboardEvent == Chessboard.ChessboardEvent.chess_piece_moved) {
+                import std.algorithm.searching : find;
+                ((_guiChessPieces.find!(guiChessPiece => guiChessPiece.chessPiece == chessPiece))[0]).refreshPosition();
+            }
+        }
+
         sfVector2i mousePositionToBoardPosition(sfVector2i mousePosition) {
             return sfVector2i(cast(int)(mousePosition.x / _squareSize), cast(int)(mousePosition.y / _squareSize));
         }
 
         void onBoardPositionClick(sfVector2i boardPosition) {
             _chessboard.moveChessPiece(_selectedGuiChessPiece.chessPiece.boardPosition, boardPosition);
-            _selectedGuiChessPiece.refreshPosition();
             clearBoardPositions();
         }
 

@@ -2,7 +2,7 @@ module oop;
 
 import bindbc.sfml;
 import std.algorithm;
-import std.typecons;
+import std.signals;
 
 enum ChessPieceColor {
     black, white
@@ -172,6 +172,7 @@ class Chessboard {
         foreach (ChessPiece chessPiece; _chessPieces) {
             if (chessPiece.boardPosition == boardPosition) {
                 chessPiece.boardPosition = sfVector2i(newBoardPosition.x, newBoardPosition.y);
+                emit(ChessboardEvent.chess_piece_moved, chessPiece);
                 break;
             }
         }
@@ -182,6 +183,12 @@ class Chessboard {
             return _chessPieces;
         }
     }
+
+    enum ChessboardEvent {
+        chess_piece_moved, chess_piece_captured
+    }
+
+    mixin Signal!(ChessboardEvent, ChessPiece);
 
     private {
         ChessPiece[] _chessPieces;
