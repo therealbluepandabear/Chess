@@ -41,7 +41,7 @@ class GUIChessPiece {
 
     private {
         void onClick(GUIChessboard guiChessboard, sfRenderWindow* renderWindow) {
-            guiChessboard.clearPossibleBoardPositions();
+            guiChessboard.clearBoardPositions();
 
             if (!guiChessboard.isMoveMode || guiChessboard.selectedGuiChessPiece != this) {
                 ChessboardPositionHandler.RouteInfo routeInfo = _chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getRouteInfo();

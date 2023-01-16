@@ -73,8 +73,9 @@ class GUIChessboard {
         }
     }
 
-    void clearPossibleBoardPositions() {
+    void clearBoardPositions() {
         _possibleBoardPositions = _possibleBoardPositions.init;
+        _capturableBoardPositions = _capturableBoardPositions.init;
     }
 
     @property {
@@ -115,7 +116,7 @@ class GUIChessboard {
         void onBoardPositionClick(sfVector2i boardPosition) {
             _chessboard.moveChessPiece(_selectedGuiChessPiece.chessPiece.boardPosition, boardPosition);
             _selectedGuiChessPiece.refreshPosition();
-            _possibleBoardPositions = _possibleBoardPositions.init;
+            clearBoardPositions();
         }
 
         sfCircleShape* createBoardPositionIndicator(sfColor color) {
