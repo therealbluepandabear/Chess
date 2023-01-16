@@ -254,19 +254,17 @@ abstract class ChessboardPositionHandler {
 
             private {
                 void trimRouteIfPieceJumpedOver(ref Route route) {
-                    if (typeid(outer._chessPiece) != typeid(Knight)) {
-                        sfVector2i[] trimmedBoardPositions;
+                    sfVector2i[] trimmedBoardPositions;
 
-                        foreach (sfVector2i boardPosition; route.boardPositions) {
-                            if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
-                                trimmedBoardPositions ~= boardPosition;
-                            } else {
-                                break;
-                            }
+                    foreach (sfVector2i boardPosition; route.boardPositions) {
+                        if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                            trimmedBoardPositions ~= boardPosition;
+                        } else {
+                            break;
                         }
-
-                        route.boardPositions = trimmedBoardPositions;
                     }
+
+                    route.boardPositions = trimmedBoardPositions;
                 }
             }
         }
