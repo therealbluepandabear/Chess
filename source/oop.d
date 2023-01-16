@@ -225,6 +225,10 @@ abstract class ChessboardPositionHandler {
     private {
         struct Route {
             sfVector2i[] boardPositions;
+
+            this(sfVector2i[] boardPositions...) {
+                this.boardPositions = boardPositions;
+            }
         }
 
         struct RouteContainer {
@@ -421,14 +425,14 @@ class KingBoardPositionHandler : ChessboardPositionHandler {
     protected override RouteContainer getPossibleBoardRoutes() {
         Route[] routes;
 
-        routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, _chessPiece.boardPosition.y)]);
-        routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, _chessPiece.boardPosition.y)]);
-        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.forward, 1).y)]);
-        routes ~= Route([sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.back, 1).y)]);
-        routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.forward, 1).y)]);
-        routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.back, 1).y)]);
-        routes ~= Route([sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.back, 1).y)]);
-        routes ~= Route([sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 1).y)]);
+        routes ~= Route(sfVector2i(getMovedPosition(MoveType.left, 1).x, _chessPiece.boardPosition.y));
+        routes ~= Route(sfVector2i(getMovedPosition(MoveType.right, 1).x, _chessPiece.boardPosition.y));
+        routes ~= Route(sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.forward, 1).y));
+        routes ~= Route(sfVector2i(_chessPiece.boardPosition.x, getMovedPosition(MoveType.back, 1).y));
+        routes ~= Route(sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.forward, 1).y));
+        routes ~= Route(sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.back, 1).y));
+        routes ~= Route(sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.back, 1).y));
+        routes ~= Route(sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 1).y));
 
         return createRouteContainer(routes);
     }
