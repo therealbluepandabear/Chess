@@ -238,7 +238,7 @@ abstract class ChessboardPositionHandler {
             sfVector2i[] finalizeToBoardPositions() {
                 sfVector2i[] boardPositions;
 
-                foreach (indx, Route route; routes) {
+                foreach (Route route; routes) {
                     trimRouteIfPieceJumpedOver(route);
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
