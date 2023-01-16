@@ -239,8 +239,7 @@ abstract class ChessboardPositionHandler {
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
                         if (boardPosition.x >= 0 && boardPosition.x <= 7 &&
-                        boardPosition.y >= 0 && boardPosition.y <= 7 &&
-                        !outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                            boardPosition.y >= 0 && boardPosition.y <= 7) {
                             boardPositions ~= boardPosition;
                         }
                     }
