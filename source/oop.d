@@ -289,8 +289,8 @@ abstract class ChessboardPositionHandler {
                     }
                 }
 
-                //import std.algorithm.mutation : remove;
-                //boardPositions = boardPositions.remove!(iterBoardPosition => capturableInfo.keys.canFind!(_iterBoardPosition => _iterBoardPosition == iterBoardPosition));
+                import std.algorithm.mutation : remove;
+                boardPositions = boardPositions.remove!(iterBoardPosition => capturableInfo.keys.canFind!(_iterBoardPosition => _iterBoardPosition == iterBoardPosition));
 
                 return MoveInfo(boardPositions, capturableInfo);
             }
