@@ -151,8 +151,6 @@ class Chessboard {
     this() {
         ChessboardOrganizer chessboardOrganizer = new ChessboardOrganizer(this);
         chessboardOrganizer.organizePieces();
-
-        assert(_chessPieces.length == 32, "_chessPieces has invalid length");
     }
 
     void addChessPiece(ChessPiece chessPiece) {
@@ -166,6 +164,15 @@ class Chessboard {
             }
         }
         return null;
+    }
+
+    void captureChessPiece(sfVector2i boardPosition) {
+        ChessPiece chessPieceToCapture = getChessPiece(boardPosition);
+
+        import std.algorithm.mutation : remove;
+        _chessPieces = _chessPieces.remove!(iterChessPiece => iterChessPiece == chessPieceToCapture);
+
+        emit(ChessboardEvent.chess_piece_captured, chessPieceToCapture);
     }
 
     void moveChessPiece(sfVector2i boardPosition, sfVector2i newBoardPosition) {
@@ -235,11 +242,11 @@ abstract class ChessboardPositionHandler {
 
     protected abstract RouteContainer getPossibleBoardRoutes();
 
-    RouteInfo getRouteInfo() {
-        return getPossibleBoardRoutes().getRouteInfo();
+    MoveInfo getMoveInfo() {
+        return getPossibleBoardRoutes().getMoveInfo();
     }
 
-    struct RouteInfo {
+    struct MoveInfo {
         sfVector2i[] possibleBoardPositions;
         ChessPiece[sfVector2i] capturableInfo;
     }
@@ -257,7 +264,7 @@ abstract class ChessboardPositionHandler {
             ChessboardPositionHandler outer;
             Route[] routes;
 
-            RouteInfo getRouteInfo() {
+            MoveInfo getMoveInfo() {
                 sfVector2i[] boardPositions;
 
                 foreach (Route route; routes) {
@@ -282,7 +289,10 @@ abstract class ChessboardPositionHandler {
                     }
                 }
 
-                return RouteInfo(boardPositions, capturableInfo);
+                import std.algorithm.mutation : remove;
+                boardPositions = boardPositions.remove!(iterBoardPosition => capturableInfo.keys.canFind!(_iterBoardPosition => _iterBoardPosition == iterBoardPosition));
+
+                return MoveInfo(boardPositions, capturableInfo);
             }
 
             private {

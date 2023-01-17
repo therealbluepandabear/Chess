@@ -41,17 +41,19 @@ class GUIChessPiece {
 
     private {
         void onClick(GUIChessboard guiChessboard, sfRenderWindow* renderWindow) {
-            guiChessboard.clearBoardPositions();
+            if (chessPiece.color == guiChessboard.turn) {
+                guiChessboard.clearBoardPositions();
 
-            if (!guiChessboard.isMoveMode || guiChessboard.selectedGuiChessPiece != this) {
-                ChessboardPositionHandler.RouteInfo routeInfo = _chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getRouteInfo();
+                if (!guiChessboard.isMoveMode || guiChessboard.selectedGuiChessPiece != this) {
+                    ChessboardPositionHandler.MoveInfo routeInfo = _chessPiece.getBoardPositionHandler(guiChessboard.chessboard).getMoveInfo();
 
-                guiChessboard.addPossibleBoardPositions(routeInfo.possibleBoardPositions);
-                guiChessboard.addCapturableBoardPositions(routeInfo.capturableInfo.keys);
-                guiChessboard.selectedGuiChessPiece = this;
-                guiChessboard.isMoveMode = true;
-            } else {
-                guiChessboard.isMoveMode = false;
+                    guiChessboard.addPossibleBoardPositions(routeInfo.possibleBoardPositions);
+                    guiChessboard.addCapturableBoardPositions(routeInfo.capturableInfo.keys);
+                    guiChessboard.selectedGuiChessPiece = this;
+                    guiChessboard.isMoveMode = true;
+                } else {
+                    guiChessboard.isMoveMode = false;
+                }
             }
         }
 

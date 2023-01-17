@@ -4,14 +4,13 @@ import bindbc.sfml;
 import sfmlextensions;
 import oop;
 import guichesspiece;
-import std.algorithm : canFind;
 
 class GUIChessboard {
     this(sfVector2u windowSize) {
         _windowSize = windowSize;
         _squareSize = (cast(float)_windowSize.x) / 8f;
         _chessboard = new Chessboard();
-        _chessboard.connect(&watchChessboard);
+        _chessboard.connect(&observeChessboard);
 
         initGuiChessPieces();
         initChessboardRectangles();
@@ -30,9 +29,11 @@ class GUIChessboard {
             sfVector2i boardPosition = mousePositionToBoardPosition(sfMouse_getPositionRenderWindow(renderWindow));
 
             if (boardPosition.x >= 0 && boardPosition.x <= 7 && boardPosition.y >= 0 && boardPosition.y <= 7) {
+                import std.algorithm.searching : canFind;
+
                 if (event.type == sfEventType.sfEvtMouseButtonPressed) {
                     _executeGuiChessPieceClick = true;
-                } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeGuiChessPieceClick && _possibleBoardPositions.canFind(boardPosition)) {
+                } else if (event.type == sfEventType.sfEvtMouseButtonReleased && _executeGuiChessPieceClick && (_possibleBoardPositions.canFind(boardPosition) || _capturableBoardPositions.canFind(boardPosition))) {
                     onBoardPositionClick(boardPosition);
                     _executeGuiChessPieceClick = false;
                 }
@@ -41,10 +42,13 @@ class GUIChessboard {
     }
 
     void render(sfRenderWindow* renderWindow) {
-        assert(_guiChessPieces.length == 32, "_guiChessPieces has invalid length");
-
         foreach (sfRectangleShape* rect; _chessboardRectangles) {
             renderWindow.sfRenderWindowExt_draw(rect);
+        }
+
+        foreach (sfVector2i capturableBoardPosition; _capturableBoardPositions) {
+            _capturableBoardPositionIndicator.sfCircleShape_setPosition(sfVector2f(capturableBoardPosition.x * _squareSize + _squareSize / 2 - _capturableBoardPositionIndicator.sfCircleShape_getRadius(), capturableBoardPosition.y * _squareSize + _squareSize / 2 - _capturableBoardPositionIndicator.sfCircleShape_getRadius()));
+            renderWindow.sfRenderWindowExt_draw(_capturableBoardPositionIndicator);
         }
 
         foreach (GUIChessPiece guiChessPiece; _guiChessPieces) {
@@ -54,11 +58,6 @@ class GUIChessboard {
         foreach (sfVector2i possibleBoardPosition; _possibleBoardPositions) {
             _possibleBoardPositionIndicator.sfCircleShape_setPosition(sfVector2f(possibleBoardPosition.x * _squareSize + _squareSize / 2 - _possibleBoardPositionIndicator.sfCircleShape_getRadius(), possibleBoardPosition.y * _squareSize + _squareSize / 2 - _possibleBoardPositionIndicator.sfCircleShape_getRadius()));
             renderWindow.sfRenderWindowExt_draw(_possibleBoardPositionIndicator);
-        }
-
-        foreach (sfVector2i capturableBoardPosition; _capturableBoardPositions) {
-            _capturableBoardPositionIndicator.sfCircleShape_setPosition(sfVector2f(capturableBoardPosition.x * _squareSize + _squareSize / 2 - _possibleBoardPositionIndicator.sfCircleShape_getRadius(), capturableBoardPosition.y * _squareSize + _squareSize / 2 - _possibleBoardPositionIndicator.sfCircleShape_getRadius()));
-            renderWindow.sfRenderWindowExt_draw(_capturableBoardPositionIndicator);
         }
     }
 
@@ -92,6 +91,10 @@ class GUIChessboard {
             return _selectedGuiChessPiece;
         }
 
+        ChessPieceColor turn() {
+            return _turn;
+        }
+
         bool isMoveMode() {
             return _isMoveMode;
         }
@@ -106,10 +109,14 @@ class GUIChessboard {
     }
 
     private {
-        void watchChessboard(Chessboard.ChessboardEvent chessboardEvent, ChessPiece chessPiece) {
+        void observeChessboard(Chessboard.ChessboardEvent chessboardEvent, ChessPiece chessPiece) {
+            import std.algorithm.searching : find;
+            import std.algorithm.mutation : remove;
+
             if (chessboardEvent == Chessboard.ChessboardEvent.chess_piece_moved) {
-                import std.algorithm.searching : find;
                 ((_guiChessPieces.find!(guiChessPiece => guiChessPiece.chessPiece == chessPiece))[0]).refreshPosition();
+            } else if (chessboardEvent == Chessboard.ChessboardEvent.chess_piece_captured) {
+                _guiChessPieces = _guiChessPieces.remove!(iterGuiChessPiece => iterGuiChessPiece.chessPiece == chessPiece);
             }
         }
 
@@ -118,13 +125,21 @@ class GUIChessboard {
         }
 
         void onBoardPositionClick(sfVector2i boardPosition) {
+            import std.algorithm.searching : canFind;
+
+            if (_chessboard.getChessPiece(boardPosition) !is null) {
+                _chessboard.captureChessPiece(boardPosition);
+            }
+
             _chessboard.moveChessPiece(_selectedGuiChessPiece.chessPiece.boardPosition, boardPosition);
+
             clearBoardPositions();
+            nextTurn();
         }
 
-        sfCircleShape* createBoardPositionIndicator(sfColor color) {
+        sfCircleShape* createBoardPositionIndicator(sfColor color, float radius = 10) {
             sfCircleShape* boardPositionIndicator = sfCircleShape_create();
-            boardPositionIndicator.sfCircleShape_setRadius(10);
+            boardPositionIndicator.sfCircleShape_setRadius(radius);
             boardPositionIndicator.sfCircleShape_setFillColor(color);
 
             return boardPositionIndicator;
@@ -135,12 +150,20 @@ class GUIChessboard {
         }
 
         void initCapturableBoardPositionIndicator() {
-            _capturableBoardPositionIndicator = createBoardPositionIndicator(sfRed);
+            _capturableBoardPositionIndicator = createBoardPositionIndicator(sfRed, 20);
         }
 
         void initGuiChessPieces() {
             foreach (ChessPiece chessPiece; _chessboard.chessPieces) {
                 _guiChessPieces ~= new GUIChessPiece(chessPiece, _squareSize);
+            }
+        }
+
+        void nextTurn() {
+            if (turn == ChessPieceColor.white) {
+                _turn = ChessPieceColor.black;
+            } else {
+                _turn = ChessPieceColor.white;
             }
         }
 
@@ -186,5 +209,6 @@ class GUIChessboard {
         GUIChessPiece _selectedGuiChessPiece;
         bool _isMoveMode;
         bool _executeGuiChessPieceClick;
+        ChessPieceColor _turn = ChessPieceColor.white;
     }
 }
