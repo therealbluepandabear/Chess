@@ -127,7 +127,7 @@ class GUIChessboard {
         void onBoardPositionClick(sfVector2i boardPosition) {
             import std.algorithm.searching : canFind;
 
-            if (_chessboard.getChessPiece(boardPosition) !is null) {
+            if (_chessboard.getChessPiece(boardPosition) !is null && (_chessboard.getChessPiece(boardPosition).color != _turn)) {
                 _chessboard.captureChessPiece(boardPosition);
             }
 
