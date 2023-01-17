@@ -1,8 +1,6 @@
 module oop;
 
 import bindbc.sfml;
-import std.algorithm;
-import std.signals;
 
 enum ChessPieceColor {
     black, white
@@ -148,6 +146,8 @@ class ChessboardOrganizer {
 }
 
 class Chessboard {
+    import std.signals;
+
     this() {
         ChessboardOrganizer chessboardOrganizer = new ChessboardOrganizer(this);
         chessboardOrganizer.organizePieces();
@@ -290,6 +290,7 @@ abstract class ChessboardPositionHandler {
                 }
 
                 import std.algorithm.mutation : remove;
+                import std.algorithm.searching : canFind;
                 boardPositions = boardPositions.remove!(iterBoardPosition => capturableInfo.keys.canFind!(_iterBoardPosition => _iterBoardPosition == iterBoardPosition));
 
                 return MoveInfo(boardPositions, capturableInfo);
@@ -299,6 +300,7 @@ abstract class ChessboardPositionHandler {
                 void trimRouteIfPieceJumpedOver(ref Route route) {
                     sfVector2i[] trimmedBoardPositions;
 
+                    import std.algorithm.searching : any;
                     foreach (sfVector2i boardPosition; route.boardPositions) {
                         if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color == outer._chessPiece.color)) {
                             trimmedBoardPositions ~= boardPosition;
