@@ -266,8 +266,15 @@ abstract class ChessboardPositionHandler {
 
             MoveInfo getMoveInfo() {
                 sfVector2i[] boardPositions;
+                ChessPiece[sfVector2i] capturableInfo;
 
                 foreach (Route route; routes) {
+                    Tuple!(ChessPiece, sfVector2i) routeCapturableInfo = getCapturableInfo(route);
+
+                    if (routeCapturableInfo != Tuple!(ChessPiece, sfVector2i).init) {
+                        capturableInfo[routeCapturableInfo[1]] = routeCapturableInfo[0];
+                    }
+
                     trimRouteIfPieceJumpedOver(route);
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
@@ -278,31 +285,31 @@ abstract class ChessboardPositionHandler {
                     }
                 }
 
-                ChessPiece[sfVector2i] capturableInfo;
-
-                foreach (sfVector2i boardPosition; boardPositions) {
-                    ChessPiece chessPieceAtPosition = outer._chessboard.getChessPiece(boardPosition);
-
-                    if (chessPieceAtPosition !is null &&
-                        chessPieceAtPosition.color != outer._chessPiece.color) {
-                        capturableInfo[boardPosition] = chessPieceAtPosition;
-                    }
-                }
-
-                import std.algorithm.mutation : remove;
-                import std.algorithm.searching : canFind;
-                boardPositions = boardPositions.remove!(iterBoardPosition => capturableInfo.keys.canFind!(_iterBoardPosition => _iterBoardPosition == iterBoardPosition));
-
                 return MoveInfo(boardPositions, capturableInfo);
             }
 
             private {
+                import std.typecons;
+
+                Tuple!(ChessPiece, sfVector2i) getCapturableInfo(ref Route route) {
+                    import std.algorithm.searching : any;
+
+                    foreach (sfVector2i boardPosition; route.boardPositions) {
+                        if (outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color != outer._chessPiece.color)) {
+                            return tuple(outer._chessboard.getChessPiece(boardPosition), boardPosition);
+                        }
+                    }
+
+                    return Tuple!(ChessPiece, sfVector2i).init;
+                }
+
                 void trimRouteIfPieceJumpedOver(ref Route route) {
                     sfVector2i[] trimmedBoardPositions;
 
                     import std.algorithm.searching : any;
+
                     foreach (sfVector2i boardPosition; route.boardPositions) {
-                        if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color == outer._chessPiece.color)) {
+                        if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
                             trimmedBoardPositions ~= boardPosition;
                         } else {
                             break;
