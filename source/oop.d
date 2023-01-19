@@ -260,19 +260,40 @@ abstract class ChessboardPositionHandler {
             }
         }
 
-        struct RouteContainer {
-            ChessboardPositionHandler outer;
+        class RouteContainer {
             Route[] routes;
+
+            this(Route[] routes) {
+                this.routes = routes;
+            }
 
             MoveInfo getMoveInfo() {
                 sfVector2i[] boardPositions;
                 ChessPiece[sfVector2i] capturableInfo;
 
                 foreach (Route route; routes) {
-                    Tuple!(ChessPiece, sfVector2i) routeCapturableInfo = getCapturableInfo(route);
+                    if (typeid(_chessPiece) != typeid(Pawn)) {
+                        Tuple!(ChessPiece, sfVector2i) routeCapturableInfo = getCapturableInfo(route);
 
-                    if (routeCapturableInfo != Tuple!(ChessPiece, sfVector2i).init) {
-                        capturableInfo[routeCapturableInfo[1]] = routeCapturableInfo[0];
+                        if (routeCapturableInfo != Tuple!(ChessPiece, sfVector2i).init) {
+                            capturableInfo[routeCapturableInfo[1]] = routeCapturableInfo[0];
+                        }
+                    } else {
+                        foreach (i; 0..2) {
+                            sfVector2i diag;
+
+                            if (i == 0) {
+                                diag = sfVector2i(getMovedPosition(MoveType.left, 1).x, getMovedPosition(MoveType.forward, 1).y);
+                            } else {
+                                diag = sfVector2i(getMovedPosition(MoveType.right, 1).x, getMovedPosition(MoveType.forward, 1).y);
+                            }
+
+                            ChessPiece chessPiece = _chessboard.getChessPiece(diag);
+
+                            if (chessPiece !is null && chessPiece.color != _chessPiece.color) {
+                                capturableInfo[diag] = chessPiece;
+                            }
+                        }
                     }
 
                     trimRouteIfPieceJumpedOver(route);
@@ -295,12 +316,12 @@ abstract class ChessboardPositionHandler {
                     import std.algorithm.searching : any;
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
-                        if (outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color == outer._chessPiece.color)) {
+                        if (_chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color == _chessPiece.color)) {
                             return Tuple!(ChessPiece, sfVector2i).init;
                         }
 
-                        if (outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color != outer._chessPiece.color)) {
-                            return tuple(outer._chessboard.getChessPiece(boardPosition), boardPosition);
+                        if (_chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color != _chessPiece.color)) {
+                            return tuple(_chessboard.getChessPiece(boardPosition), boardPosition);
                         }
                     }
 
@@ -313,7 +334,7 @@ abstract class ChessboardPositionHandler {
                     import std.algorithm.searching : any;
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
-                        if (!outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
+                        if (!_chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition)) {
                             trimmedBoardPositions ~= boardPosition;
                         } else {
                             break;
@@ -326,7 +347,7 @@ abstract class ChessboardPositionHandler {
         }
 
         RouteContainer createRouteContainer(Route[] routes...) {
-            return RouteContainer(this, routes.dup);
+            return new RouteContainer(routes.dup);
         }
 
         enum MoveType {
