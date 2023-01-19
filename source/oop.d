@@ -295,6 +295,10 @@ abstract class ChessboardPositionHandler {
                     import std.algorithm.searching : any;
 
                     foreach (sfVector2i boardPosition; route.boardPositions) {
+                        if (outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color == outer._chessPiece.color)) {
+                            return Tuple!(ChessPiece, sfVector2i).init;
+                        }
+
                         if (outer._chessboard.chessPieces.any!(chessPiece => chessPiece.boardPosition == boardPosition && chessPiece.color != outer._chessPiece.color)) {
                             return tuple(outer._chessboard.getChessPiece(boardPosition), boardPosition);
                         }
